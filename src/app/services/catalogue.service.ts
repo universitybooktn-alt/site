@@ -209,22 +209,28 @@ export function estProduitCategorieLivre(p: { categorie?: string; sousCategorie?
 }
 
 /**
- * Mots-clés (sous-chaîne, insensible casse/espaces) de catégorie/sous-catégorie caisse dont les
- * produits sont des ouvrages/annales et s'affichent dans la vue Documents plutôt que Fournitures
- * scolaires : toute la branche caisse "Droit" (sous-catégories "Examen", "Livre concours",
- * "Code juridique"), et "Prépa" — entièrement composée de cours/TD/examens/synthèses (aucune
- * fourniture physique constatée dans cette catégorie), qui s'affichait donc à tort dans le
- * carrousel "Fournitures scolaires" de l'accueil avant cet ajout. Ajouter ici d'autres branches
- * juridiques/documentaires au besoin.
+ * Mots-clés (sous-chaîne, insensible casse/espaces/accents) de catégorie/sous-catégorie caisse
+ * dont les produits sont des ouvrages/annales et s'affichent dans la vue Documents plutôt que
+ * Fournitures scolaires : toute la branche caisse "Droit" (sous-catégories "Examen", "Livre
+ * concours", "Code juridique"), "Prépa" et "Révision comptable CES" — entièrement composées de
+ * cours/TD/examens/synthèses/résumés, sous toutes leurs sous-catégories (Comptabilité, Finance,
+ * Audit, Gestion, Fiscalité, Droit...), sans aucune fourniture physique constatée — qui
+ * s'affichaient donc à tort dans le carrousel "Fournitures scolaires" de l'accueil avant cet
+ * ajout. Ajouter ici d'autres branches juridiques/documentaires au besoin.
  */
-const MOTS_CLES_DOCUMENT = ['droit', 'examen', 'livre concours', 'code juridique', 'prépa', 'prepa'];
+const MOTS_CLES_DOCUMENT = ['droit', 'examen', 'livre concours', 'code juridique', 'prepa', 'revision comptable'];
 
 /** Un produit caisse (catégorie OU sous-catégorie) relève-t-il de la vue Documents ? Couvre les
- *  ouvrages "Livre" (voir estProduitCategorieLivre) et la branche "Droit" (MOTS_CLES_DOCUMENT). */
+ *  ouvrages "Livre" (voir estProduitCategorieLivre) et les branches ci-dessus (MOTS_CLES_DOCUMENT,
+ *  comparées accents retirés pour couvrir "Révision comptable"/"Prépa" sans dupliquer chaque
+ *  variante accentuée). */
 export function estProduitDocument(p: { categorie?: string; sousCategorie?: string }): boolean {
   if (estProduitCategorieLivre(p)) return true;
-  const cat = (p.categorie || '').trim().toLowerCase();
-  const sc  = (p.sousCategorie || '').trim().toLowerCase();
+  const norm = (v: string | undefined) => (v || '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .trim().toLowerCase();
+  const cat = norm(p.categorie);
+  const sc  = norm(p.sousCategorie);
   return MOTS_CLES_DOCUMENT.some(k => cat.includes(k) || sc.includes(k));
 }
 export function estCategorieJeux(categorie: string | undefined | null): boolean {
