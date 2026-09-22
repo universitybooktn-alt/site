@@ -196,17 +196,22 @@
     <!-- ── CONFIRMATION ── -->
     <div *ngIf="orderConfirmed" class="ck-body ck-confirmed">
       <div class="ck-confirmed-icon">
-        <i class="fa-solid fa-circle-check"></i>
+        <i class="fa-solid" [class.fa-circle-check]="!avisEnAttenteValidation" [class.fa-hourglass-half]="avisEnAttenteValidation"></i>
       </div>
-      <h3 class="font-spectral fw-bold mb-2" style="font-size:26px;color:#1B2430;">Commande confirmée !</h3>
-      <p style="color:#6B7480;max-width:420px;margin:0 auto 8px;">
+      <h3 class="font-spectral fw-bold mb-2" style="font-size:26px;color:#1B2430;">
+        {{ avisEnAttenteValidation ? 'Avis envoyé !' : 'Commande confirmée !' }}
+      </h3>
+      <p *ngIf="!avisEnAttenteValidation" style="color:#6B7480;max-width:420px;margin:0 auto 8px;">
         Votre commande a été enregistrée avec succès.
         <ng-container *ngIf="derniereCommandeEmail">
           Un e-mail de confirmation avec votre facture{{ derniereCommandeContientDocuments ? ' et le lien de téléchargement de votre document' : '' }}
           a été envoyé à <strong>{{ derniereCommandeEmail }}</strong>.
         </ng-container>
       </p>
-      <p class="fw-semibold" style="color:var(--accent);font-size:15px;">
+      <p *ngIf="avisEnAttenteValidation" style="color:#6B7480;max-width:420px;margin:0 auto 8px;">
+        Merci ! Votre document sera accessible dans <strong>Mes Documents</strong> dès qu'un administrateur aura validé votre avis.
+      </p>
+      <p *ngIf="!avisEnAttenteValidation" class="fw-semibold" style="color:var(--accent);font-size:15px;">
         Montant total : {{ formatPrix(montantCommande) }}
       </p>
       <p *ngIf="pointsGagnes > 0" class="ck-points-gagnes">
@@ -222,14 +227,14 @@
       <p *ngIf="!estConnecte" class="small" style="color:#6B7480;">
         Aucun compte n'a été créé — conservez l'e-mail reçu pour accéder à votre document.
       </p>
-      <a *ngIf="estConnecte && derniereCommandeContientDocuments"
+      <a *ngIf="estConnecte && derniereCommandeContientDocuments && !avisEnAttenteValidation"
          routerLink="/user/documents" (click)="closeCheckout()"
          class="btn btn-accent px-5 py-3 rounded-pill fw-semibold mt-3 ub-ripple" style="font-size:15px;">
         <i class="fa-solid fa-book me-2"></i>Voir mes documents
       </a>
       <button (click)="closeCheckout()"
-              [class.btn-accent]="!(estConnecte && derniereCommandeContientDocuments)"
-              [class.btn-outline-dark-ub]="estConnecte && derniereCommandeContientDocuments"
+              [class.btn-accent]="!(estConnecte && derniereCommandeContientDocuments && !avisEnAttenteValidation)"
+              [class.btn-outline-dark-ub]="estConnecte && derniereCommandeContientDocuments && !avisEnAttenteValidation"
               class="btn px-5 py-3 rounded-pill fw-semibold mt-3" style="font-size:15px;">
         <i class="fa-solid fa-house me-2"></i>Retour au panier
       </button>
@@ -534,8 +539,14 @@
         <div class="ck-section-label">
           <i class="fa-solid fa-wallet me-2"></i>Moyen de paiement
         </div>
+        <div class="alert py-2 px-3" *ngIf="commandeContientDocumentPayant" style="background:#EFF6FF;color:#1D4ED8;border:none;">
+          <i class="fa-solid fa-circle-info me-2"></i>
+          Un document numérique payant se règle uniquement en ligne{{ deblocageParAvisPossible ? ' ou se débloque gratuitement en laissant un avis, validé par un administrateur' : '' }}
+          — le paiement à la livraison n'est pas disponible pour ce panier.
+        </div>
+
         <div class="row g-3">
-          <div class="col-12 col-md-6">
+          <div class="col-12 col-md-6" *ngIf="!commandeContientDocumentPayant">
             <label class="ck-radio-card" [class.selected]="moyenPaiement === 'livraison'">
               <input type="radio" formControlName="moyenPaiement" value="livraison" class="ck-radio-input">
               <div class="ck-radio-icon" style="background:#F0FDF4;">
@@ -561,6 +572,19 @@
               <i class="fa-solid fa-circle-check ck-radio-check"></i>
             </label>
           </div>
+          <div class="col-12 col-md-6" *ngIf="deblocageParAvisPossible">
+            <label class="ck-radio-card" [class.selected]="moyenPaiement === 'avis'">
+              <input type="radio" formControlName="moyenPaiement" value="avis" class="ck-radio-input">
+              <div class="ck-radio-icon" style="background:#FFFBEB;">
+                <span style="font-size:18px;">✍️</span>
+              </div>
+              <div>
+                <div class="ck-radio-title">Débloquer avec un avis</div>
+                <div class="ck-radio-desc">Gratuit — après validation d'un administrateur</div>
+              </div>
+              <i class="fa-solid fa-circle-check ck-radio-check"></i>
+            </label>
+          </div>
         </div>
 
         <!-- ── Panneau Paiement en ligne : redirection vers la page hébergée Konnect ──
@@ -573,6 +597,34 @@
               Vous serez redirigé·e vers la page de paiement sécurisée <strong>Konnect</strong>
               pour régler par carte bancaire ou e-DINAR.
             </p>
+          </div>
+        </div>
+
+        <!-- ── Panneau Avis : rédaction + note, obligatoire pour ce mode (voir majValidateursAvis) ── -->
+        <div class="ck-payment-fields" *ngIf="moyenPaiement === 'avis'">
+          <div class="ck-payment-panel mt-3 py-3 px-3" style="background:#FFFBEB;border-radius:14px;">
+            <p class="mb-3" style="font-size:13.5px;color:#3C444E;">
+              <i class="fa-solid fa-circle-info me-1"></i>
+              Votre document sera accessible dans <strong>Mes Documents</strong> dès qu'un administrateur aura validé votre avis — généralement sous 1 à 2 jours ouvrables.
+            </p>
+            <label class="ck-label">Votre note</label>
+            <div class="d-flex gap-2 mb-3">
+              <button type="button" *ngFor="let n of [1,2,3,4,5]"
+                      class="btn btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center"
+                      style="width:34px;height:34px;border:1.5px solid #E5C158;"
+                      [style.background]="checkoutForm.get('avisNote')?.value >= n ? '#EAB308' : '#fff'"
+                      [style.color]="checkoutForm.get('avisNote')?.value >= n ? '#fff' : '#EAB308'"
+                      (click)="checkoutForm.get('avisNote')?.setValue(n)">
+                <i class="fa-solid fa-star" style="font-size:13px;"></i>
+              </button>
+            </div>
+            <label class="ck-label">Votre avis sur le document <span class="ck-required">*</span></label>
+            <textarea formControlName="avisTexte" maxlength="1000" rows="4" class="ck-input ck-textarea"
+                      [class.is-invalid]="fieldInvalid('avisTexte')"
+                      placeholder="Décrivez le contenu, sa qualité, ce qu'il vous a apporté… (15 caractères minimum)"></textarea>
+            <div *ngIf="fieldInvalid('avisTexte')" class="ck-error">
+              <i class="fa-solid fa-circle-exclamation me-1"></i>{{ getFieldError('avisTexte') }}
+            </div>
           </div>
         </div>
 
@@ -660,12 +712,16 @@
         <button type="submit" class="btn btn-accent px-5 py-3 rounded-pill fw-semibold" style="font-size:15px;"
                 [disabled]="chargementCommande">
           <span *ngIf="!chargementCommande">
-            <i class="fa-solid" [class.fa-check]="moyenPaiement !== 'carte'" [class.fa-lock]="moyenPaiement === 'carte'" style="margin-right:8px;"></i>
-            {{ moyenPaiement === 'carte' ? 'Payer en ligne' : 'Confirmer la commande' }}
+            <i class="fa-solid"
+               [class.fa-lock]="moyenPaiement === 'carte'"
+               [class.fa-paper-plane]="moyenPaiement === 'avis'"
+               [class.fa-check]="moyenPaiement === 'livraison'"
+               style="margin-right:8px;"></i>
+            {{ moyenPaiement === 'carte' ? 'Payer en ligne' : moyenPaiement === 'avis' ? "Envoyer l'avis" : 'Confirmer la commande' }}
           </span>
           <span *ngIf="chargementCommande">
             <i class="fa-solid fa-spinner fa-spin me-2"></i>
-            {{ redirectionKonnectEnCours ? 'Redirection vers Konnect...' : 'Enregistrement...' }}
+            {{ redirectionKonnectEnCours ? 'Redirection vers Konnect...' : "Enregistrement..." }}
           </span>
         </button>
       </div>

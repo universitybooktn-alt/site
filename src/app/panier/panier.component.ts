@@ -8,15 +8,20 @@ import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { OrdersService } from '../services/orders.service';
 import { PaymentsService } from '../services/payments.service';
+import { AvisService } from '../services/avis.service';
 import { GOUVERNORATS_TUNISIE, delegationsPourGouvernorat } from '../shared/tunisie-geo.data';
 
-type MoyenPaiement = 'livraison' | 'carte';
+type MoyenPaiement = 'livraison' | 'carte' | 'avis';
 /** Étapes du wizard de commande — la 3ᵉ étape (confirmation) réutilise l'écran existant
  *  piloté par `orderConfirmed`, elle n'a pas besoin d'une valeur dédiée ici. */
 type EtapeCheckout = 'livraison' | 'paiement';
 
 /** Lettres (accents compris), espaces, apostrophes et tirets — pour prénom/nom/titulaire carte. */
 const NOM_PATTERN = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/;
+
+/** Même seuil que backend/controllers/avis.controller.js#LONGUEUR_MIN_AVIS — validé aussi côté
+ *  client pour ne pas laisser saisir un avis que le serveur refusera de toute façon. */
+const LONGUEUR_MIN_AVIS = 15;
 
 @Component({
   selector: 'app-panier',
@@ -54,6 +59,10 @@ export class PanierComponent implements OnInit, OnDestroy {
    *  distinct de `chargementCommande` (paiement à la livraison, enregistrement direct). */
   redirectionKonnectEnCours = false;
 
+  /** Déblocage par avis (voir initierAvisDeblocage) : commande envoyée mais en attente de
+   *  validation admin — l'écran de confirmation affiche un message différent d'un achat réglé. */
+  avisEnAttenteValidation = false;
+
   // ── Wizard de commande (Livraison → Paiement → Confirmation) ──
   etapeCheckout: EtapeCheckout = 'livraison';
   /** Champs du formulaire unique (checkoutForm, inchangé) validés avant de passer à l'étape Paiement. */
@@ -79,6 +88,7 @@ export class PanierComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private ordersService: OrdersService,
     private paymentsService: PaymentsService,
+    private avisService: AvisService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -101,6 +111,9 @@ export class PanierComponent implements OnInit, OnDestroy {
       typeLivraison: ['domicile', Validators.required],
       moyenPaiement: ['livraison', Validators.required],
       commentaire:   ['', Validators.maxLength(500)],
+      /* ── Déblocage par avis (voir moyenPaiement === 'avis') ── */
+      avisTexte:     ['', [Validators.minLength(LONGUEUR_MIN_AVIS), Validators.maxLength(1000)]],
+      avisNote:      [5, [Validators.required, Validators.min(1), Validators.max(5)]],
     });
 
     this.compteForm = this.fb.group({
@@ -114,6 +127,9 @@ export class PanierComponent implements OnInit, OnDestroy {
 
     this.formSubs.push(
       this.checkoutForm.get('typeLivraison')!.valueChanges.subscribe(val => this.majValidateursAdresse(val))
+    );
+    this.formSubs.push(
+      this.checkoutForm.get('moyenPaiement')!.valueChanges.subscribe(val => this.majValidateursAvis(val))
     );
     this.formSubs.push(
       this.checkoutForm.get('gouvernorat')!.valueChanges.subscribe(gouvernorat => {
@@ -171,6 +187,20 @@ export class PanierComponent implements OnInit, OnDestroy {
     return this.items.some(i => !i.estDocument);
   }
 
+  /** Un document dans le panier est TOUJOURS payant : un document gratuit ne passe jamais par le
+   *  panier (téléchargement immédiat, voir produit-detail.component.ts#telechargerGratuitement).
+   *  Le paiement à la livraison n'a donc pas de sens ici — voir orders.controller.js#create,
+   *  qui refuse désormais ce cas côté serveur (aucun argent réel n'était encaissé avant ce garde-fou). */
+  get commandeContientDocumentPayant(): boolean {
+    return this.items.some(i => i.estDocument);
+  }
+
+  /** Déblocage par avis (voir avisService.initierAvis) : réservé à un panier ne contenant qu'UN
+   *  SEUL document payant — même restriction que backend/controllers/avis.controller.js#initierAvis. */
+  get deblocageParAvisPossible(): boolean {
+    return this.items.length === 1 && !!this.items[0].estDocument;
+  }
+
   /** Une commande sans compte contenant un document numérique n'a aucun autre moyen de le
    * recevoir que par e-mail (aucun compte créé, donc pas d'espace « Mes Documents ») — l'e-mail
    * n'est donc obligatoire que dans ce cas précis, jamais pour une commande 100% fournitures. */
@@ -210,10 +240,16 @@ export class PanierComponent implements OnInit, OnDestroy {
     this.orderConfirmed     = false;
     this.erreurCommande     = '';
     this.redirectionKonnectEnCours = false;
+    this.avisEnAttenteValidation = false;
     this.delegations        = [];
     this.pointsGagnes       = 0;
     this.chargerEstimationPoints();
-    this.checkoutForm.reset({ typeLivraison: 'domicile', moyenPaiement: 'livraison' });
+    // Un panier contenant un document payant ne peut jamais être réglé à la livraison (voir
+    // commandeContientDocumentPayant) — Konnect reste le mode par défaut le plus naturel dans ce
+    // cas, "avis" restant un choix explicite du client plutôt qu'une valeur pré-sélectionnée.
+    const moyenPaiementDefaut: MoyenPaiement = this.commandeContientDocumentPayant ? 'carte' : 'livraison';
+    this.checkoutForm.reset({ typeLivraison: 'domicile', moyenPaiement: moyenPaiementDefaut, avisNote: 5 });
+    this.majValidateursAvis(moyenPaiementDefaut);
 
     // Wizard + carte "Gagnez du temps" : repartent toujours de l'étape Livraison à
     // l'ouverture (la carte reste masquée si l'utilisateur est déjà connecté).
@@ -492,8 +528,22 @@ export class PanierComponent implements OnInit, OnDestroy {
     const labels: Record<MoyenPaiement, string> = {
       livraison: 'Paiement à la livraison',
       carte: 'Paiement en ligne (Konnect)',
+      avis: 'Déblocage par avis (en attente de validation)',
     };
     return labels[this.moyenPaiement];
+  }
+
+  /** Avis obligatoire (longueur minimale) uniquement quand ce mode est sélectionné — comme
+   *  `email` pour `emailRequisPourCommande` (voir openCheckout). */
+  private majValidateursAvis(moyenPaiement: string): void {
+    const ctrl = this.checkoutForm.get('avisTexte');
+    if (!ctrl) return;
+    ctrl.setValidators(
+      moyenPaiement === 'avis'
+        ? [Validators.required, Validators.minLength(LONGUEUR_MIN_AVIS), Validators.maxLength(1000)]
+        : [Validators.minLength(LONGUEUR_MIN_AVIS), Validators.maxLength(1000)]
+    );
+    ctrl.updateValueAndValidity({ emitEvent: false });
   }
 
   /* ── Helpers de validation ─────────────────────────────────── */
@@ -557,6 +607,8 @@ export class PanierComponent implements OnInit, OnDestroy {
     this.derniereCommandeContientDocuments = this.items.some(i => i.estDocument);
     if (this.moyenPaiement === 'carte') {
       this.initierPaiementEnLigne();
+    } else if (this.moyenPaiement === 'avis') {
+      this.initierAvisDeblocage();
     } else {
       this.enregistrerCommande();
     }
@@ -634,6 +686,37 @@ export class PanierComponent implements OnInit, OnDestroy {
       error: err => {
         this.chargementCommande = false;
         this.erreurCommande = err.error?.message || "Erreur lors de l'initialisation du paiement en ligne.";
+      }
+    });
+  }
+
+  /**
+   * Déblocage GRATUIT d'un document payant par avis, en alternative à Konnect — voir
+   * avis.controller.js#initierAvis (réservé à un panier ne contenant qu'un seul document payant,
+   * voir deblocageParAvisPossible). La commande est enregistrée "En attente" côté serveur, comme
+   * pour Konnect : le panier n'est vidé qu'ici (l'accès, lui, n'est donné qu'après validation
+   * admin — voir "Mes avis" / e-mail de confirmation une fois approuvé).
+   */
+  private initierAvisDeblocage(): void {
+    const valeurs = this.checkoutForm.value;
+    this.derniereCommandeEmail = valeurs.email || this.authService.currentUser?.email || '';
+
+    this.chargementCommande = true;
+    this.avisService.initierAvis({
+      ...this.payloadCommande(),
+      avisTexte: (valeurs.avisTexte || '').trim(),
+      avisNote: valeurs.avisNote || 5
+    }).subscribe({
+      next: () => {
+        this.chargementCommande = false;
+        this.montantCommande = 0;
+        this.avisEnAttenteValidation = true;
+        this.orderConfirmed = true;
+        this.cartService.vider();
+      },
+      error: err => {
+        this.chargementCommande = false;
+        this.erreurCommande = err.error?.message || "Erreur lors de l'envoi de votre avis.";
       }
     });
   }

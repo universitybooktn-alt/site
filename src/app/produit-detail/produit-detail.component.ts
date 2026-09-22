@@ -7,6 +7,7 @@ import { CartService } from '../services/cart.service';
 import { BoutiqueFavoritesService } from '../services/boutique-favorites.service';
 import { DocumentsService } from '../services/documents.service';
 import { AuthService } from '../services/auth.service';
+import { AvisService, AvisPublic } from '../services/avis.service';
 import { photoUrl } from '../shared/photo-url.util';
 
 type Onglet = 'description' | 'caracteristiques' | 'complementaires' | 'avis' | 'similaires';
@@ -41,7 +42,8 @@ export class ProduitDetailComponent implements OnInit, OnDestroy {
     public cartService: CartService,
     private favService: BoutiqueFavoritesService,
     private documentsService: DocumentsService,
-    private authService: AuthService
+    private authService: AuthService,
+    private avisService: AvisService
   ) {}
 
   ngOnInit(): void {
@@ -88,6 +90,9 @@ export class ProduitDetailComponent implements OnInit, OnDestroy {
     this.ongletActif = 'description';
     this.couleurSelectionnee = this.produit?.couleurs?.[0] || null;
     this.formatSelectionne = this.produit?.formats?.[0] || null;
+    // Avis rechargés à chaque produit (voir changerOnglet) — jamais réutilisés d'une fiche à l'autre.
+    this.avisListe = [];
+    this.avisCharges = false;
   }
 
   /* ── Galerie (vraies photos produit envoyées par l'admin ; repli sur l'icône stylée
@@ -346,6 +351,23 @@ export class ProduitDetailComponent implements OnInit, OnDestroy {
 
   changerOnglet(o: Onglet): void {
     this.ongletActif = o;
+    if (o === 'avis') this.chargerAvis();
+  }
+
+  /* ── Avis (documents uniquement — voir avis.controller.js#listApprouvesPourDocument) ── */
+
+  avisListe: AvisPublic[] = [];
+  avisChargement = false;
+  private avisCharges = false;
+
+  private chargerAvis(): void {
+    if (this.avisCharges || !this.produit || this.produit.domaine !== 'documents') return;
+    this.avisCharges = true;
+    this.avisChargement = true;
+    this.avisService.listApprouves(this.produit.mongoId).subscribe({
+      next: res => { this.avisListe = res.avis || []; this.avisChargement = false; },
+      error: () => { this.avisChargement = false; }
+    });
   }
 
   /* ── Champs dynamiques selon le domaine ── */

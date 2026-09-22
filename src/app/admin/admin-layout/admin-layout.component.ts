@@ -26,6 +26,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     { label: 'Commandes', icon: 'fa-box', route: '/admin/commandes' },
     { label: 'Documents', icon: 'fa-file-pdf', route: '/admin/documents' },
     { label: 'Documents proposés', icon: 'fa-file-circle-plus', route: '/admin/documents-proposes' },
+    { label: 'Avis à valider', icon: 'fa-star-half-stroke', route: '/admin/avis' },
     { label: 'Produits', icon: 'fa-store', route: '/admin/produits' }
   ];
 

@@ -486,6 +486,21 @@
   margin-bottom: 14px;
   letter-spacing: 4px;
 }
+.pdd-avis-etoiles--sm {
+  font-size: 13px;
+  color: #EAB308;
+  margin-bottom: 6px;
+  letter-spacing: 2px;
+}
+.pdd-avis-etoiles--sm .pdd-star-off { color: #E4E7EC; }
+
+.pdd-avis-liste { display: flex; flex-direction: column; gap: 16px; }
+.pdd-avis-item {
+  padding: 14px 16px;
+  border: 1px solid #ECEEF1;
+  border-radius: 14px;
+  background: #fff;
+}
 
 /* ── Produits similaires ── */
 .pdd-similaires-carousel {

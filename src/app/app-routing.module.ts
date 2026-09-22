@@ -28,6 +28,7 @@ import { UtilisateursComponent } from './admin/utilisateurs/utilisateurs.compone
 import { CommandesComponent as AdminCommandesComponent } from './admin/commandes/commandes.component';
 import { FournisseursComponent as AdminDocumentsComponent } from './admin/fournisseurs/fournisseurs.component';
 import { DocumentsProposesComponent } from './admin/documents-proposes/documents-proposes.component';
+import { AvisComponent as AdminAvisComponent } from './admin/avis/avis.component';
 import { ProduitsComponent } from './admin/produits/produits.component';
 import { AdminProfilComponent } from './admin/profil/admin-profil.component';
 
@@ -70,6 +71,7 @@ const routes: Routes = [
       { path: 'commandes', component: AdminCommandesComponent },
       { path: 'documents', component: AdminDocumentsComponent },
       { path: 'documents-proposes', component: DocumentsProposesComponent },
+      { path: 'avis', component: AdminAvisComponent },
       { path: 'produits', component: ProduitsComponent },
       { path: 'profil', component: AdminProfilComponent }
     ]

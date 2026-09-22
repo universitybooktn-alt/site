@@ -242,12 +242,36 @@
           </div>
         </div>
 
-        <div *ngIf="ongletActif === 'avis'" class="pdd-anim-fade pdd-avis-vide">
-          <div class="pdd-avis-etoiles">
-            <i class="fa-regular fa-star" *ngFor="let s of [1,2,3,4,5]"></i>
+        <div *ngIf="ongletActif === 'avis'" class="pdd-anim-fade">
+
+          <div class="d-flex justify-content-center py-4" *ngIf="avisChargement">
+            <i class="fa-solid fa-spinner fa-spin" style="color:var(--accent)"></i>
           </div>
-          <p class="fw-semibold mb-1" style="color:#1B2430;">Aucun avis pour le moment</p>
-          <p class="small" style="color:#9AA0A8;">Soyez le premier à donner votre avis sur ce produit.</p>
+
+          <div class="pdd-avis-vide" *ngIf="!avisChargement && avisListe.length === 0">
+            <div class="pdd-avis-etoiles">
+              <i class="fa-regular fa-star" *ngFor="let s of [1,2,3,4,5]"></i>
+            </div>
+            <p class="fw-semibold mb-1" style="color:#1B2430;">Aucun avis pour le moment</p>
+            <p class="small" style="color:#9AA0A8;">
+              {{ produit.domaine === 'documents' && !produit.gratuit
+                  ? "Les avis apparaissent ici une fois validés par un administrateur."
+                  : "Soyez le premier à donner votre avis sur ce produit." }}
+            </p>
+          </div>
+
+          <div class="pdd-avis-liste" *ngIf="!avisChargement && avisListe.length > 0">
+            <div class="pdd-avis-item" *ngFor="let a of avisListe">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <span class="fw-semibold" style="color:#1B2430;">{{ a.auteurNom || 'Client' }}</span>
+                <span class="small" style="color:#9AA0A8;">{{ a.createdAt | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="pdd-avis-etoiles pdd-avis-etoiles--sm mb-1">
+                <i class="fa-solid fa-star" *ngFor="let s of [1,2,3,4,5]" [class.pdd-star-off]="s > a.note"></i>
+              </div>
+              <p class="small mb-0" style="color:#4A525C;white-space:pre-line;">{{ a.texte }}</p>
+            </div>
+          </div>
         </div>
 
         <div *ngIf="ongletActif === 'similaires'" class="pdd-anim-fade">
