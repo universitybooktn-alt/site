@@ -3,7 +3,7 @@ import { HttpEventType } from '@angular/common/http';
 import { Router } from '@angular/router';
 import {
   DocumentsService, PurchasedDocument, DocumentPropose, PropositionForm, StatutProposition,
-  CategorieArbreDoc
+  CategorieArbreDoc, DocumentEnAttente
 } from '../../services/documents.service';
 
 const FENETRE_TELECHARGEMENT_MS = 24 * 60 * 60 * 1000;
@@ -32,6 +32,10 @@ export class DocumentsComponent implements OnInit, OnDestroy {
   documentSelectionne: PurchasedDocument | null = null;
   private minuteur?: ReturnType<typeof setInterval>;
 
+  /** Documents payants commandés mais pas encore débloqués (Konnect non confirmé / avis non
+   *  encore validé) — voir documents.controller.js#enAttente. Jamais téléchargeables. */
+  documentsEnAttente: DocumentEnAttente[] = [];
+
   // ── « Proposer un document » ──────────────────────────────────────────────
   showProposerModal = false;
   categoriesArbre: CategorieArbreDoc[] = [];
@@ -55,8 +59,21 @@ export class DocumentsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.charger();
     this.chargerPropositions();
+    this.chargerEnAttente();
     // Force le recalcul du compte à rebours (et de l'expiration) affiché sans recharger les données.
     this.minuteur = setInterval(() => {}, 30000);
+  }
+
+  private chargerEnAttente(): void {
+    this.documentsService.enAttente().subscribe({
+      next: res => (this.documentsEnAttente = res.enAttente || []),
+      error: () => { /* best-effort : la liste principale reste utilisable sans cette section */ }
+    });
+  }
+
+  libelleAttente(d: DocumentEnAttente): string {
+    if (d.mode === 'avis') return 'En attente de validation de votre avis par un administrateur';
+    return 'En attente de confirmation du paiement en ligne';
   }
 
   ngOnDestroy(): void {
@@ -254,6 +271,10 @@ export class DocumentsComponent implements OnInit, OnDestroy {
 
   trackById(_index: number, item: PurchasedDocument): string {
     return item._id;
+  }
+
+  trackByCommandeId(_index: number, item: DocumentEnAttente): string {
+    return item.commandeId;
   }
 
   // ── « Proposer un document » ─────────────────────────────────────────────

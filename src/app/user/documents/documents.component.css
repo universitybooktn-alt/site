@@ -21,6 +21,16 @@
   box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .2);
 }
 
+/* Document commandé mais pas encore débloqué (Konnect/avis) — jamais téléchargeable. */
+.ub-doc-card--pending {
+  opacity: .75;
+  border: 1.5px dashed #E1B84E;
+}
+.ub-doc-card--pending:hover {
+  transform: none;
+  box-shadow: 0 8px 32px -18px rgba(0, 0, 0, .14);
+}
+
 .ub-doc-card-visuel {
   position: relative;
   height: 150px;

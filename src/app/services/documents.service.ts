@@ -30,6 +30,22 @@ export interface DocumentsResponse {
   totalPages: number;
 }
 
+/**
+ * Document payant commandé mais pas encore accessible — ni paiement Konnect confirmé, ni avis
+ * validé (voir documents.controller.js#enAttente). Jamais téléchargeable : affiché dans
+ * « Mes Documents » uniquement pour que le client voie où en est sa commande.
+ */
+export interface DocumentEnAttente {
+  commandeId: string;
+  numero: string;
+  titre: string;
+  image: string;
+  prix: number;
+  createdAt: string;
+  mode: 'konnect' | 'avis';
+  avisStatut: 'en_attente' | 'approuve' | 'refuse' | null;
+}
+
 export type StatutProposition = 'en_attente' | 'approuve' | 'refuse';
 
 /** Document proposé par l'utilisateur, en attente de validation par un administrateur. */
@@ -92,6 +108,12 @@ export class DocumentsService {
     if (options.page) params = params.set('page', options.page);
     if (options.limite) params = params.set('limite', options.limite);
     return this.http.get<DocumentsResponse>(this.apiUrl, { params });
+  }
+
+  /** Documents payants commandés mais pas encore débloqués (Konnect non confirmé / avis non
+   *  encore validé) — voir DocumentEnAttente. */
+  enAttente(): Observable<{ enAttente: DocumentEnAttente[] }> {
+    return this.http.get<{ enAttente: DocumentEnAttente[] }>(`${this.apiUrl}/en-attente`);
   }
 
   addToFavorites(id: string): Observable<{ message: string }> {
