@@ -564,16 +564,17 @@
             </label>
           </div>
           <div class="col-12 col-md-6">
-            <label class="ck-radio-card" [class.selected]="moyenPaiement === 'carte'">
-              <input type="radio" formControlName="moyenPaiement" value="carte" class="ck-radio-input">
+            <!-- Paiement en ligne (Konnect) désactivé temporairement : carte non cliquable. -->
+            <label class="ck-radio-card" aria-disabled="true" title="Paiement en ligne temporairement indisponible"
+                   style="opacity:.5;cursor:not-allowed;pointer-events:none;filter:grayscale(1);">
+              <input type="radio" value="carte" class="ck-radio-input" disabled>
               <div class="ck-radio-icon" style="background:#EFF6FF;">
                 <span style="font-size:18px;">💳</span>
               </div>
               <div>
                 <div class="ck-radio-title">Paiement en ligne</div>
-                <div class="ck-radio-desc">Carte bancaire, e-DINAR — via Konnect</div>
+                <div class="ck-radio-desc">Temporairement indisponible</div>
               </div>
-              <i class="fa-solid fa-circle-check ck-radio-check"></i>
             </label>
           </div>
           <div class="col-12 col-md-6" *ngIf="deblocageParAvisPossible">
