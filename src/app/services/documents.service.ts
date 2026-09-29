@@ -92,6 +92,8 @@ export interface DocumentAutorise {
   prix: number;
   prixNormal?: number;
   enPromo?: boolean;
+  /** Remise (%) carte fidélité — appliquée à la commande (compte lié à une carte). */
+  remiseCarteFidelite?: number;
   dateAutorisation?: string;
 }
 

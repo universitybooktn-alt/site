@@ -83,6 +83,10 @@
                 <span class="da-cell-val">
                   <span class="da-prix">{{ formatPrix(d.prix) }}</span>
                   <span class="da-prix-old" *ngIf="d.enPromo && d.prixNormal">{{ formatPrix(d.prixNormal) }}</span>
+                  <span class="da-carte" *ngIf="d.remiseCarteFidelite && d.prix > 0" title="Remise carte fidélité appliquée automatiquement à la commande">
+                    <i class="fa-solid fa-id-card"></i>
+                    -{{ d.remiseCarteFidelite }}% carte : {{ formatPrix(prixCarte(d)) }}
+                  </span>
                 </span>
               </td>
               <td class="da-col-action">

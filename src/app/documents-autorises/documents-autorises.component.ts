@@ -60,6 +60,12 @@ export class DocumentsAutorisesComponent implements OnInit {
     return v.toFixed(3).replace('.', ',') + ' د.ت';
   }
 
+  /** Prix après remise carte fidélité (appliquée par le serveur à la commande). */
+  prixCarte(d: DocumentAutorise): number {
+    const pct = d.remiseCarteFidelite || 0;
+    return Math.round(d.prix * (1 - pct / 100) * 1000) / 1000;
+  }
+
   ajouterPanier(d: DocumentAutorise): void {
     this.cartService.ajouter({
       id: d.produitId,
