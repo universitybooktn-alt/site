@@ -337,9 +337,9 @@ export class LoginComponent implements AfterViewInit {
   // ── Étape 1 : identifiant (email OU numéro WhatsApp) ──
   get forgotIdentifiantError(): string {
     if (!this.forgotIdentifiantTouched) return '';
-    if (!this.forgotIdentifiant.trim()) return 'Un email ou un numéro WhatsApp est obligatoire.';
+    if (!this.forgotIdentifiant.trim()) return 'Un email ou un numéro de téléphone est obligatoire.';
     if (!this.detecterMethodeForgot(this.forgotIdentifiant)) {
-      return 'Veuillez saisir un email valide ou un numéro WhatsApp valide.';
+      return 'Veuillez saisir un email valide ou un numéro de téléphone valide (8 chiffres).';
     }
     return '';
   }

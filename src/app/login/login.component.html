@@ -260,7 +260,7 @@
       <div class="mb-3">
         <div class="input-group-ub">
           <i class="fa-regular fa-envelope input-icon-ub" *ngIf="forgotIdentifiantEstEmail" style="color:#9AA0A8"></i>
-          <i class="fa-brands fa-whatsapp input-icon-ub" *ngIf="!forgotIdentifiantEstEmail" style="color:#25D366"></i>
+          <i class="fa-solid fa-mobile-screen-button input-icon-ub" *ngIf="!forgotIdentifiantEstEmail"></i>
           <input type="text" class="form-control ub-input" name="forgotIdentifiant"
                  [(ngModel)]="forgotIdentifiant" (blur)="onForgotIdentifiantBlur()"
                  [placeholder]="'login.forgotModal.identifiantPlaceholder' | translate" autocomplete="email">
