@@ -96,7 +96,10 @@ export class PanierComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.cartSub = this.cartService.items$.subscribe(items => this.items = items);
+    this.cartSub = this.cartService.items$.subscribe(items => {
+      this.items = items;
+      this.chargerRemiseCarte();
+    });
 
     this.checkoutForm = this.fb.group({
       /* ── Coordonnées ── */
@@ -161,6 +164,7 @@ export class PanierComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.cartSub?.unsubscribe();
+    this.remiseCarteSub?.unsubscribe();
     this.formSubs.forEach(s => s.unsubscribe());
     document.body.classList.remove('ub-no-scroll');
   }
@@ -178,8 +182,10 @@ export class PanierComponent implements OnInit, OnDestroy {
   }
 
   /** Aucune logique de remise dans l'application : toujours 0, exposé pour l'affichage du résumé. */
+  /** Remise carte fidélité calculée par le serveur (voir chargerRemiseCarte) — 0 sans compte
+   *  connecté porteur d'une carte, ou si aucun produit du panier n'en bénéficie. */
   get remise(): number {
-    return 0;
+    return this.remiseCarteMontant;
   }
 
   get nombreArticles(): number {
@@ -191,7 +197,7 @@ export class PanierComponent implements OnInit, OnDestroy {
     return this.checkoutForm?.get('typeLivraison')?.value === 'retrait' ? 0 : this.FRAIS_LIVRAISON;
   }
 
-  get total(): number { return this.sousTotal + this.fraisLivraison; }
+  get total(): number { return Math.max(0, Math.round((this.sousTotal + this.fraisLivraison - this.remise) * 1000) / 1000); }
 
   /** Une adresse de livraison n'a de sens que si le panier contient au moins une fourniture scolaire. */
   get commandeContientFournitures(): boolean {
@@ -258,6 +264,7 @@ export class PanierComponent implements OnInit, OnDestroy {
     this.carteFidelite      = null;
     this.carteFideliteChargee = false;
     this.chargerEstimationPoints();
+    this.chargerRemiseCarte();
     // Un panier contenant un document payant ne peut jamais être réglé à la livraison (voir
     // commandeContientDocumentPayant) — Konnect reste le mode par défaut le plus naturel dans ce
     // cas, "avis" restant un choix explicite du client plutôt qu'une valeur pré-sélectionnée.
@@ -368,6 +375,32 @@ export class PanierComponent implements OnInit, OnDestroy {
     this.ordersService.estimationPoints(this.itemsPayload()).subscribe({
       next: res => (this.pointsEstimes = res.points || 0),
       error: () => (this.pointsEstimes = 0)
+    });
+  }
+
+  // ── Remise carte fidélité (produits avec remiseCarteFidelite, client connecté porteur d'une carte) ──
+  remiseCarteMontant = 0;
+  /** Le panier contient des produits remisés pour les porteurs de carte (même sans compte). */
+  remiseCarteDisponible = false;
+  /** Le client connecté a bien une carte fidélité (la remise est donc appliquée). */
+  remiseCarteAppliquee = false;
+  private remiseCarteSub?: Subscription;
+
+  /** Source de vérité côté serveur (orders.controller.js#estimationRemiseCarte) — même calcul
+   *  que celui appliqué au total de la commande. Best-effort : un échec laisse 0. */
+  private chargerRemiseCarte(): void {
+    this.remiseCarteSub?.unsubscribe();
+    if (this.items.length === 0) {
+      this.remiseCarteMontant = 0; this.remiseCarteDisponible = false; this.remiseCarteAppliquee = false;
+      return;
+    }
+    this.remiseCarteSub = this.ordersService.estimationRemiseCarte(this.itemsPayload()).subscribe({
+      next: res => {
+        this.remiseCarteMontant = res.montant || 0;
+        this.remiseCarteDisponible = (res.lignes || []).length > 0;
+        this.remiseCarteAppliquee = !!res.carte && this.remiseCarteMontant > 0;
+      },
+      error: () => { this.remiseCarteMontant = 0; this.remiseCarteAppliquee = false; }
     });
   }
 
@@ -501,6 +534,7 @@ export class PanierComponent implements OnInit, OnDestroy {
     }
     this.etapeCheckout = 'paiement';
     this.chargerEstimationPoints();
+    this.chargerRemiseCarte();
     document.querySelector('.ck-body')?.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

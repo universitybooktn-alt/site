@@ -37,6 +37,8 @@ export interface Produit {
   nouveaute?: boolean;
   populaire?: boolean;
   ancienPrix?: number;
+  /** Remise (%) réservée aux porteurs de la carte fidélité (client connecté) — 0/absent sinon. */
+  remiseCarteFidelite?: number;
   disponible?: boolean;
   /** Vente par pack (synchronisée depuis la fiche produit caisse). `packPrix` et `packNbPieces`
    *  ne sont définis QUE si les deux sont renseignés (> 0) — la Boutique propose alors le choix
@@ -113,6 +115,7 @@ interface ProduitApi {
   couleurs?: VarianteCouleur[];
   formats?: VarianteFormat[];
   ancienPrix?: number;
+  remiseCarteFidelite?: number;
   badge?: string;
   nouveaute?: boolean;
   populaire?: boolean;
@@ -329,6 +332,7 @@ export class CatalogueService {
       nouveaute: p.nouveaute,
       populaire: p.populaire,
       ancienPrix: p.ancienPrix,
+      remiseCarteFidelite: p.remiseCarteFidelite || 0,
       // Le backend est la seule source de vérité pour la disponibilité (même logique que
       // mapDocument juste en dessous) — le stock n'est qu'informatif ici : un produit publié
       // depuis la caisse doit rester achetable même si son stock caisse n'a pas encore été

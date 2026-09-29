@@ -212,6 +212,12 @@ export class ProduitDetailComponent implements OnInit, OnDestroy {
     return this.produit.prix + (this.formatSelectionne?.prixDelta || 0);
   }
 
+  /** Prix affiché, remise carte fidélité déduite. */
+  get prixAvecCarte(): number {
+    const pct = this.produit?.remiseCarteFidelite || 0;
+    return Math.round(this.prixAffiche * (1 - pct / 100) * 1000) / 1000;
+  }
+
   get ancienPrixAffiche(): number | undefined {
     if (this.unite === 'pack' && this.aPack) return undefined;
     if (!this.produit?.ancienPrix) return undefined;

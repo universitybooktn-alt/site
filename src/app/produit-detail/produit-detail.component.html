@@ -79,6 +79,15 @@
             <span class="pdd-prix-unite" *ngIf="packDisponible">/ {{ unite === 'pack' ? 'pack de ' + p.packNbPieces : 'pièce' }}</span>
           </div>
 
+          <!-- Remise réservée aux porteurs de la carte fidélité (appliquée à la commande si connecté) -->
+          <div class="pdd-carte-remise" *ngIf="p.remiseCarteFidelite && !p.gratuit">
+            <i class="fa-solid fa-id-card"></i>
+            <div>
+              <strong>-{{ p.remiseCarteFidelite }}% avec la carte fidélité</strong> : {{ formatPrix(prixAvecCarte) }}
+              <span class="pdd-carte-remise-sub">Remise appliquée automatiquement à la commande si vous êtes connecté avec un compte lié à votre carte.</span>
+            </div>
+          </div>
+
           <!-- ── Vente à la pièce / au pack. Le bouton Pack n'est actif que si le nombre de
                pièces/pack est connu en base (fiche produit caisse). ── -->
           <div *ngIf="montreUnite" class="pdd-variante-bloc">

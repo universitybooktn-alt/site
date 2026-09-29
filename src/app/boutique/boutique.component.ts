@@ -418,6 +418,12 @@ export class BoutiqueComponent implements OnInit, OnDestroy {
     return this.catalogueService.reference(p);
   }
 
+  /** Prix unitaire affiché, remise carte fidélité déduite (voir remiseCarteFidelite.service.js). */
+  prixCarte(p: Produit): number {
+    const pct = p.remiseCarteFidelite || 0;
+    return Math.round(this.prixUnitaire(p) * (1 - pct / 100) * 1000) / 1000;
+  }
+
   pourcentagePromo(p: Produit): number {
     return this.catalogueService.pourcentagePromo(p);
   }

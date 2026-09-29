@@ -101,8 +101,18 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
-              <span class="small" style="color:#6B7480;">Remise</span>
-              <span class="fw-semibold" style="color:#1B2430;">{{ formatPrix(remise) }}</span>
+              <span class="small" style="color:#6B7480;">
+                Remise{{ remiseCarteAppliquee ? ' carte fidélité' : '' }}
+              </span>
+              <span class="fw-semibold" [style.color]="remise > 0 ? '#16A34A' : '#1B2430'">
+                {{ remise > 0 ? '− ' : '' }}{{ formatPrix(remise) }}
+              </span>
+            </div>
+            <div class="pn-remise-carte-hint" *ngIf="remiseCarteDisponible && !remiseCarteAppliquee">
+              <i class="fa-solid fa-id-card me-1"></i>
+              {{ estConnecte
+                  ? "Certains produits sont remisés pour les porteurs de la carte fidélité — aucune carte n'est associée à votre compte."
+                  : 'Connectez-vous avec un compte lié à votre carte fidélité pour profiter de la remise carte.' }}
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
@@ -734,6 +744,10 @@
           <div class="ck-summary-ligne">
             <span>Livraison</span>
             <span>{{ fraisLivraison === 0 ? 'Gratuite' : formatPrix(fraisLivraison) }}</span>
+          </div>
+          <div class="ck-summary-ligne" *ngIf="remise > 0">
+            <span><i class="fa-solid fa-id-card me-2"></i>Remise carte fidélité</span>
+            <span style="color:#16A34A;" class="fw-semibold">− {{ formatPrix(remise) }}</span>
           </div>
           <div class="ck-summary-ligne">
             <span>TVA</span>

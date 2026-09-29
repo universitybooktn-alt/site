@@ -1919,3 +1919,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Remise carte fidélité ── */
+.produit-badge.badge-carte { background: #FEF3C7; color: #92400E; border-color: #FCD34D; }
+.produit-badge.badge-carte i { margin-right: 3px; }
+.produit-prix-carte {
+  flex-basis: 100%;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #92400E;
+}
+.produit-prix-carte i { margin-right: 3px; }

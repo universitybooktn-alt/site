@@ -897,3 +897,14 @@
   .ck-points-stats { grid-template-columns: 1fr; }
   .ck-points-login-btns .btn { width: 100%; }
 }
+
+/* ── Remise carte fidélité (récap panier) ── */
+.pn-remise-carte-hint {
+  margin: -6px 0 14px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #FFFBEB;
+  color: #92400E;
+  font-size: 12px;
+  line-height: 1.45;
+}

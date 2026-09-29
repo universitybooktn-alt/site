@@ -335,6 +335,9 @@
         <span *ngIf="pourcentagePromo(p) > 0" class="produit-badge badge-promo">
           -{{ pourcentagePromo(p) }}%
         </span>
+        <span *ngIf="p.remiseCarteFidelite" class="produit-badge badge-carte" title="Remise réservée aux porteurs de la carte fidélité">
+          <i class="fa-solid fa-id-card"></i> -{{ p.remiseCarteFidelite }}% carte
+        </span>
         <span *ngIf="p.badge" class="produit-badge"
               [class.badge-bestseller]="p.badge === 'Best-seller'"
               [class.badge-gratuit]="p.badge === 'Gratuit'"
@@ -429,6 +432,9 @@
           <div class="produit-prix" [class.gratuit]="p.gratuit">{{ formatPrix(prixUnitaire(p)) }}</div>
           <span class="produit-prix-unite" *ngIf="aPack(p)">
             /&nbsp;{{ uniteDe(p) === 'pack' ? (p.packNbPieces ? (('boutique.card.packOf' | translate) + ' ' + p.packNbPieces) : ('boutique.card.pack' | translate)) : ('boutique.card.piece' | translate) }}
+          </span>
+          <span *ngIf="p.remiseCarteFidelite && !p.gratuit" class="produit-prix-carte">
+            <i class="fa-solid fa-id-card"></i> {{ formatPrix(prixCarte(p)) }} avec carte fidélité
           </span>
           <span *ngIf="economie(p) > 0 && uniteDe(p) === 'piece'" class="produit-economie">{{ 'boutique.card.savings' | translate }} {{ formatPrix(economie(p)) }}</span>
         </div>

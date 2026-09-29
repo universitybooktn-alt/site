@@ -87,6 +87,12 @@ export class OrdersService {
     return this.http.post<{ message: string; commande: Order; pointsFidelite: number; pointsUtilises?: number; pointsRestants?: number }>(this.apiUrl, payload);
   }
 
+  /** Remise carte fidélité du panier (client connecté porteur d'une carte) — `lignes` liste les
+   *  produits concernés et leur % même sans compte, pour inciter à se connecter. */
+  estimationRemiseCarte(items: OrderItem[]): Observable<{ montant: number; carte: boolean; lignes: { produitId: number; pourcentage: number }[] }> {
+    return this.http.post<{ montant: number; carte: boolean; lignes: { produitId: number; pourcentage: number }[] }>(`${this.apiUrl}/remise-carte-estimation`, { items });
+  }
+
   /** Estimation des points fidélité que rapporterait le panier (affichée avant validation). */
   estimationPoints(items: OrderItem[]): Observable<{ points: number }> {
     return this.http.post<{ points: number }>(`${this.apiUrl}/points-estimation`, { items });
