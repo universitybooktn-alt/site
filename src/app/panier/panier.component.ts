@@ -261,6 +261,8 @@ export class PanierComponent implements OnInit, OnDestroy {
     this.delegations        = [];
     this.pointsGagnes       = 0;
     this.pointsUtilisesCommande = 0;
+    this.montantPointsCommande = 0;
+    this.resteLivraisonCommande = 0;
     this.carteFidelite      = null;
     this.carteFideliteChargee = false;
     this.chargerEstimationPoints();
@@ -592,7 +594,7 @@ export class PanierComponent implements OnInit, OnDestroy {
       livraison: 'Paiement à la livraison',
       carte: 'Paiement en ligne (Konnect)',
       avis: 'Déblocage par avis (en attente de validation)',
-      points: 'Points fidélité',
+      points: this.carteFidelite && !this.pointsCouvrentTout ? 'Points fidélité + Paiement à la livraison' : 'Points fidélité',
     };
     return labels[this.moyenPaiement];
   }
@@ -619,6 +621,9 @@ export class PanierComponent implements OnInit, OnDestroy {
   carteFideliteChargee = false;
   /** Points débités par le serveur — affichés sur l'écran de confirmation. */
   pointsUtilisesCommande = 0;
+  /** Montant réglé en points / reste payé à la livraison (paiement partiel) — écran de confirmation. */
+  montantPointsCommande = 0;
+  resteLivraisonCommande = 0;
 
   chargerCarteFidelite(): void {
     if (!this.estConnecte || this.chargementCarteFidelite) return;
@@ -644,9 +649,33 @@ export class PanierComponent implements OnInit, OnDestroy {
     return taux > 0 ? Math.ceil(Math.round(this.total * 1000) / 1000 / taux) : 0;
   }
 
+  /** Points réellement débités : tous ceux nécessaires, ou tout le solde s'il ne suffit pas
+   *  (le reste est alors payé à la livraison) — même calcul que payerCommandeEnPoints côté serveur. */
+  get pointsUtilisables(): number {
+    return Math.min(this.pointsRequis, this.carteFidelite?.points || 0);
+  }
+
+  /** Montant (DT) couvert par les points utilisés — plafonné au total. */
+  get montantPayeEnPoints(): number {
+    const taux = this.carteFidelite?.tauxPoint || 0;
+    return Math.min(this.total, Math.round(this.pointsUtilisables * taux * 1000) / 1000);
+  }
+
+  /** Reste à payer à la livraison quand les points ne couvrent pas tout le total. */
+  get resteALivraison(): number {
+    return Math.max(0, Math.round((this.total - this.montantPayeEnPoints) * 1000) / 1000);
+  }
+
+  /** Les points couvrent tout le total. */
+  get pointsCouvrentTout(): boolean {
+    return this.resteALivraison === 0;
+  }
+
+  /** Un reste à la livraison est impossible pour un document payant (rien n'est livré). */
   get paiementPointsPossible(): boolean {
     return this.estConnecte && !!this.carteFidelite && this.pointsRequis > 0
-      && this.carteFidelite.points >= this.pointsRequis;
+      && this.carteFidelite.points > 0
+      && (this.pointsCouvrentTout || !this.commandeContientDocumentPayant);
   }
 
   /** Connexion / création de compte depuis le panneau « Points fidélité » : retour direct au
@@ -722,7 +751,9 @@ export class PanierComponent implements OnInit, OnDestroy {
       if (!this.paiementPointsPossible) {
         this.erreurCommande = !this.estConnecte
           ? 'Connectez-vous pour payer avec vos points fidélité.'
-          : 'Points fidélité insuffisants pour régler cette commande.';
+          : this.carteFidelite && this.carteFidelite.points > 0
+            ? 'Vos points ne couvrent pas le total et un document payant ne peut pas être payé à la livraison.'
+            : "Vous n'avez aucun point fidélité à utiliser.";
         return;
       }
       this.enregistrerCommande(true);
@@ -780,6 +811,8 @@ export class PanierComponent implements OnInit, OnDestroy {
       next: res => {
         this.chargementCommande = false;
         this.pointsUtilisesCommande = res.pointsUtilises || 0;
+        this.montantPointsCommande = res.montantPoints || 0;
+        this.resteLivraisonCommande = res.resteALivraison || 0;
         this.montantCommande = this.total;
         this.pointsGagnes = res.pointsFidelite || 0;
         this.orderConfirmed = true;

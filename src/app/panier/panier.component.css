@@ -924,3 +924,23 @@
 .pn-item-carte--off { background: #FEF3C7; color: #92400E; }
 .pn-item-total { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; }
 .pn-item-total-old { font-size: 12.5px; color: #9AA0A8; text-decoration: line-through; }
+
+/* ── Paiement partiel : points + livraison ── */
+.ck-points-partiel {
+  background: #fff;
+  border: 1px solid #F1DDE0;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.ck-points-partiel-ligne {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13.5px;
+  color: #3C444E;
+  padding: 4px 0;
+}
+.ck-points-partiel-ligne strong { color: #166534; white-space: nowrap; }
+.ck-points-partiel-reste { border-top: 1px dashed #F1DDE0; margin-top: 4px; padding-top: 8px; }
+.ck-points-partiel-reste strong { color: var(--accent); font-size: 15px; }
+.ck-points-partiel-note { font-size: 12px; color: #6B7480; margin: 6px 0 0; }

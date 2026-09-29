@@ -83,8 +83,8 @@ export class OrdersService {
     invite?: InviteCommande;
     /** 'points' = commande réglée avec les points fidélité (compte connecté requis). */
     modePaiement?: 'points';
-  }): Observable<{ message: string; commande: Order; pointsFidelite: number; pointsUtilises?: number; pointsRestants?: number }> {
-    return this.http.post<{ message: string; commande: Order; pointsFidelite: number; pointsUtilises?: number; pointsRestants?: number }>(this.apiUrl, payload);
+  }): Observable<{ message: string; commande: Order; pointsFidelite: number; pointsUtilises?: number; pointsRestants?: number; montantPoints?: number; resteALivraison?: number }> {
+    return this.http.post<{ message: string; commande: Order; pointsFidelite: number; pointsUtilises?: number; pointsRestants?: number; montantPoints?: number; resteALivraison?: number }>(this.apiUrl, payload);
   }
 
   /** Remise carte fidélité du panier (client connecté porteur d'une carte) — `lignes` liste les

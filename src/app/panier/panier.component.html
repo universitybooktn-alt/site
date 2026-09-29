@@ -237,7 +237,9 @@
       </p>
       <p *ngIf="pointsUtilisesCommande > 0" class="ck-points-gagnes">
         <i class="fa-solid fa-star me-2"></i>
-        Payée avec {{ pointsUtilisesCommande | number }} points fidélité
+        {{ resteLivraisonCommande > 0
+            ? (pointsUtilisesCommande | number) + ' points utilisés (' + formatPrix(montantPointsCommande) + ') — reste ' + formatPrix(resteLivraisonCommande) + ' à payer à la livraison'
+            : 'Payée avec ' + (pointsUtilisesCommande | number) + ' points fidélité' }}
       </p>
       <p *ngIf="estConnecte" class="small" style="color:#6B7480;">
         Retrouvez le suivi de cette commande dans
@@ -671,13 +673,30 @@
                 <p class="ck-points-taux">
                   1 point = {{ formatPrix(cf.tauxPoint) }} · Total à régler : {{ formatPrix(total) }}
                 </p>
-                <div class="ck-points-ok" *ngIf="paiementPointsPossible">
+                <div class="ck-points-ok" *ngIf="paiementPointsPossible && pointsCouvrentTout">
                   <i class="fa-solid fa-circle-check me-2"></i>
-                  Il vous restera {{ (cf.points - pointsRequis) | number }} points après cette commande.
+                  Vos points couvrent toute la commande. Il vous restera {{ (cf.points - pointsRequis) | number }} points.
+                </div>
+                <!-- Points insuffisants : tous les points sont utilisés, le reste est payé à la livraison -->
+                <div class="ck-points-partiel" *ngIf="paiementPointsPossible && !pointsCouvrentTout">
+                  <div class="ck-points-partiel-ligne">
+                    <span><i class="fa-solid fa-star me-2"></i>Payé avec mes {{ pointsUtilisables | number }} points</span>
+                    <strong>− {{ formatPrix(montantPayeEnPoints) }}</strong>
+                  </div>
+                  <div class="ck-points-partiel-ligne ck-points-partiel-reste">
+                    <span><i class="fa-solid fa-truck me-2"></i>Reste à payer à la livraison</span>
+                    <strong>{{ formatPrix(resteALivraison) }}</strong>
+                  </div>
+                  <p class="ck-points-partiel-note">
+                    Vos points ne suffisent pas pour tout le total : ils sont tous utilisés et vous payez le reste
+                    en espèces à la réception.
+                  </p>
                 </div>
                 <div class="ck-points-ko" *ngIf="!paiementPointsPossible">
                   <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                  Points insuffisants : il vous manque {{ (pointsRequis - cf.points) | number }} points. Choisissez un autre moyen de paiement.
+                  {{ cf.points > 0
+                      ? 'Il vous manque ' + ((pointsRequis - cf.points) | number) + ' points : un document payant ne peut pas être payé à la livraison. Choisissez un autre moyen de paiement.'
+                      : "Vous n'avez aucun point fidélité à utiliser. Choisissez un autre moyen de paiement." }}
                 </div>
               </ng-container>
             </ng-container>
@@ -774,7 +793,11 @@
           </div>
           <div class="ck-summary-ligne ck-summary-points" *ngIf="moyenPaiement === 'points' && carteFidelite">
             <span><i class="fa-solid fa-star me-2"></i>Points utilisés</span>
-            <span class="fw-semibold">{{ pointsRequis | number }} pts</span>
+            <span class="fw-semibold">{{ pointsUtilisables | number }} pts (− {{ formatPrix(montantPayeEnPoints) }})</span>
+          </div>
+          <div class="ck-summary-ligne" *ngIf="moyenPaiement === 'points' && carteFidelite && !pointsCouvrentTout">
+            <span><i class="fa-solid fa-truck me-2"></i>Reste à payer à la livraison</span>
+            <span class="fw-semibold" style="color:var(--accent);">{{ formatPrix(resteALivraison) }}</span>
           </div>
           <div class="ck-summary-ligne" *ngIf="commandeContientFournitures">
             <span>Adresse</span>
@@ -826,7 +849,7 @@
                style="margin-right:8px;"></i>
             {{ moyenPaiement === 'carte' ? 'Payer en ligne'
                : moyenPaiement === 'avis' ? "Envoyer l'avis"
-               : moyenPaiement === 'points' ? ('Payer ' + (pointsRequis | number) + ' points')
+               : moyenPaiement === 'points' ? (pointsCouvrentTout ? ('Payer ' + (pointsUtilisables | number) + ' points') : 'Confirmer la commande')
                : 'Confirmer la commande' }}
           </span>
           <span *ngIf="chargementCommande">
