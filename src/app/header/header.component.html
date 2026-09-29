@@ -86,11 +86,16 @@
            pied CTA. Documents = CategoriesSiteService ; Fournitures = CategoriesCaisseService
            (hors Soutenance/Jeux/Livre) ; les autres rayons = lien direct + court descriptif. -->
       <div class="ub-boutique-item position-relative">
-        <a routerLink="/boutique" routerLinkActive="ub-active"
+        <a routerLinkActive="ub-active"
            class="nav-link fw-semibold text-secondary py-2 d-flex align-items-center gap-1">
           {{ 'header.nav.shop' | translate }}
           <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
         </a>
+        <!--a routerLink="/boutique" routerLinkActive="ub-active"
+           class="nav-link fw-semibold text-secondary py-2 d-flex align-items-center gap-1">
+          {{ 'header.nav.shop' | translate }}
+          <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
+        </a-->
 
         <div class="ubm2" (mouseleave)="megaDomaine = 'documents'">
 
