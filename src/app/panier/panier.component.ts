@@ -9,9 +9,10 @@ import { UserService } from '../services/user.service';
 import { OrdersService } from '../services/orders.service';
 import { PaymentsService } from '../services/payments.service';
 import { AvisService } from '../services/avis.service';
+import { MesAchatsService, CarteFidelite } from '../services/mes-achats.service';
 import { GOUVERNORATS_TUNISIE, delegationsPourGouvernorat } from '../shared/tunisie-geo.data';
 
-type MoyenPaiement = 'livraison' | 'carte' | 'avis';
+type MoyenPaiement = 'livraison' | 'carte' | 'avis' | 'points';
 /** Étapes du wizard de commande — la 3ᵉ étape (confirmation) réutilise l'écran existant
  *  piloté par `orderConfirmed`, elle n'a pas besoin d'une valeur dédiée ici. */
 type EtapeCheckout = 'livraison' | 'paiement';
@@ -89,6 +90,7 @@ export class PanierComponent implements OnInit, OnDestroy {
     private ordersService: OrdersService,
     private paymentsService: PaymentsService,
     private avisService: AvisService,
+    private mesAchatsService: MesAchatsService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -129,7 +131,10 @@ export class PanierComponent implements OnInit, OnDestroy {
       this.checkoutForm.get('typeLivraison')!.valueChanges.subscribe(val => this.majValidateursAdresse(val))
     );
     this.formSubs.push(
-      this.checkoutForm.get('moyenPaiement')!.valueChanges.subscribe(val => this.majValidateursAvis(val))
+      this.checkoutForm.get('moyenPaiement')!.valueChanges.subscribe(val => {
+        this.majValidateursAvis(val);
+        if (val === 'points') this.chargerCarteFidelite();
+      })
     );
     this.formSubs.push(
       this.checkoutForm.get('gouvernorat')!.valueChanges.subscribe(gouvernorat => {
@@ -145,6 +150,12 @@ export class PanierComponent implements OnInit, OnDestroy {
     // via un lien "Commander" (/panier?checkout=1), sans dupliquer le formulaire de commande.
     if (this.route.snapshot.queryParamMap.get('checkout') && this.cartService.items.length > 0) {
       this.openCheckout();
+      // Retour de la connexion lancée depuis le panneau « Points fidélité » : on reprend
+      // directement à l'étape Paiement avec ce mode sélectionné si la livraison est déjà valide.
+      if (this.route.snapshot.queryParamMap.get('paiement') === 'points' && this.estConnecte) {
+        this.checkoutForm.get('moyenPaiement')!.setValue('points');
+        if (this.champsEtapeLivraison.every(c => this.checkoutForm.get(c)?.valid)) this.etapeCheckout = 'paiement';
+      }
     }
   }
 
@@ -243,6 +254,9 @@ export class PanierComponent implements OnInit, OnDestroy {
     this.avisEnAttenteValidation = false;
     this.delegations        = [];
     this.pointsGagnes       = 0;
+    this.pointsUtilisesCommande = 0;
+    this.carteFidelite      = null;
+    this.carteFideliteChargee = false;
     this.chargerEstimationPoints();
     // Un panier contenant un document payant ne peut jamais être réglé à la livraison (voir
     // commandeContientDocumentPayant) — Konnect reste le mode par défaut le plus naturel dans ce
@@ -529,6 +543,7 @@ export class PanierComponent implements OnInit, OnDestroy {
       livraison: 'Paiement à la livraison',
       carte: 'Paiement en ligne (Konnect)',
       avis: 'Déblocage par avis (en attente de validation)',
+      points: 'Points fidélité',
     };
     return labels[this.moyenPaiement];
   }
@@ -544,6 +559,55 @@ export class PanierComponent implements OnInit, OnDestroy {
         : [Validators.minLength(LONGUEUR_MIN_AVIS), Validators.maxLength(1000)]
     );
     ctrl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  /* ── Paiement en points fidélité ──────────────────────────────────── */
+
+  /** Carte fidélité du compte connecté (points + valeur en DT) — chargée quand le mode « Points
+   *  fidélité » est choisi. null = pas encore chargée, ou aucune carte rattachée au compte. */
+  carteFidelite: CarteFidelite | null = null;
+  chargementCarteFidelite = false;
+  carteFideliteChargee = false;
+  /** Points débités par le serveur — affichés sur l'écran de confirmation. */
+  pointsUtilisesCommande = 0;
+
+  chargerCarteFidelite(): void {
+    if (!this.estConnecte || this.chargementCarteFidelite) return;
+    this.chargementCarteFidelite = true;
+    this.mesAchatsService.maCarteFidelite().subscribe({
+      next: res => {
+        this.carteFidelite = res.carte;
+        this.chargementCarteFidelite = false;
+        this.carteFideliteChargee = true;
+      },
+      error: () => {
+        this.carteFidelite = null;
+        this.chargementCarteFidelite = false;
+        this.carteFideliteChargee = true;
+      }
+    });
+  }
+
+  /** Points nécessaires pour régler le total TTC (livraison comprise) — même calcul que le
+   *  serveur (orders.controller.js#payerCommandeEnPoints : arrondi au point supérieur). */
+  get pointsRequis(): number {
+    const taux = this.carteFidelite?.tauxPoint || 0;
+    return taux > 0 ? Math.ceil(Math.round(this.total * 1000) / 1000 / taux) : 0;
+  }
+
+  get paiementPointsPossible(): boolean {
+    return this.estConnecte && !!this.carteFidelite && this.pointsRequis > 0
+      && this.carteFidelite.points >= this.pointsRequis;
+  }
+
+  /** Connexion / création de compte depuis le panneau « Points fidélité » : retour direct au
+   *  tunnel de commande une fois connecté (returnUrl honoré par LoginComponent / RegisterComponent). */
+  seConnecterPourPoints(): void {
+    this.router.navigate(['/login'], { queryParams: { returnUrl: '/panier?checkout=1&paiement=points' } });
+  }
+
+  creerComptePourPoints(): void {
+    this.router.navigate(['/register'], { queryParams: { returnUrl: '/panier?checkout=1&paiement=points' } });
   }
 
   /* ── Helpers de validation ─────────────────────────────────── */
@@ -605,7 +669,15 @@ export class PanierComponent implements OnInit, OnDestroy {
     }
 
     this.derniereCommandeContientDocuments = this.items.some(i => i.estDocument);
-    if (this.moyenPaiement === 'carte') {
+    if (this.moyenPaiement === 'points') {
+      if (!this.paiementPointsPossible) {
+        this.erreurCommande = !this.estConnecte
+          ? 'Connectez-vous pour payer avec vos points fidélité.'
+          : 'Points fidélité insuffisants pour régler cette commande.';
+        return;
+      }
+      this.enregistrerCommande(true);
+    } else if (this.moyenPaiement === 'carte') {
       this.initierPaiementEnLigne();
     } else if (this.moyenPaiement === 'avis') {
       this.initierAvisDeblocage();
@@ -649,14 +721,16 @@ export class PanierComponent implements OnInit, OnDestroy {
    * « Paiement en ligne » (Konnect) suit un chemin différent (initierPaiementEnLigne ci-dessous) :
    * ici, uniquement le paiement à la livraison, où la commande est finalisée tout de suite.
    */
-  private enregistrerCommande(): void {
+  private enregistrerCommande(enPoints = false): void {
     const valeurs = this.checkoutForm.value;
     this.derniereCommandeEmail = valeurs.email || this.authService.currentUser?.email || '';
 
     this.chargementCommande = true;
-    this.ordersService.create(this.payloadCommande()).subscribe({
+    const payload = enPoints ? { ...this.payloadCommande(), modePaiement: 'points' as const } : this.payloadCommande();
+    this.ordersService.create(payload).subscribe({
       next: res => {
         this.chargementCommande = false;
+        this.pointsUtilisesCommande = res.pointsUtilises || 0;
         this.montantCommande = this.total;
         this.pointsGagnes = res.pointsFidelite || 0;
         this.orderConfirmed = true;

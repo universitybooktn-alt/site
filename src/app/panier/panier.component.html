@@ -218,6 +218,10 @@
         <i class="fa-solid fa-star me-2"></i>
         + {{ pointsGagnes }} point{{ pointsGagnes > 1 ? 's' : '' }} fidélité crédité{{ pointsGagnes > 1 ? 's' : '' }} sur votre carte
       </p>
+      <p *ngIf="pointsUtilisesCommande > 0" class="ck-points-gagnes">
+        <i class="fa-solid fa-star me-2"></i>
+        Payée avec {{ pointsUtilisesCommande | number }} points fidélité
+      </p>
       <p *ngIf="estConnecte" class="small" style="color:#6B7480;">
         Retrouvez le suivi de cette commande dans
         <a routerLink="/user/commandes" (click)="closeCheckout()" class="fw-semibold text-decoration-none" style="color:var(--accent);">
@@ -585,6 +589,85 @@
               <i class="fa-solid fa-circle-check ck-radio-check"></i>
             </label>
           </div>
+          <div class="col-12 col-md-6">
+            <label class="ck-radio-card" [class.selected]="moyenPaiement === 'points'">
+              <input type="radio" formControlName="moyenPaiement" value="points" class="ck-radio-input">
+              <div class="ck-radio-icon" style="background:#FDF2F3;">
+                <span style="font-size:18px;">⭐</span>
+              </div>
+              <div>
+                <div class="ck-radio-title">Payer avec mes points fidélité</div>
+                <div class="ck-radio-desc">Utilisez les points de votre carte fidélité</div>
+              </div>
+              <i class="fa-solid fa-circle-check ck-radio-check"></i>
+            </label>
+          </div>
+        </div>
+
+        <!-- ── Panneau Points fidélité ── -->
+        <div class="ck-payment-fields" *ngIf="moyenPaiement === 'points'">
+          <div class="ck-payment-panel ck-points-panel mt-3">
+
+            <!-- Non connecté : inviter à se connecter ou créer un compte -->
+            <ng-container *ngIf="!estConnecte">
+              <div class="ck-points-login">
+                <i class="fa-solid fa-user-lock ck-points-login-ico"></i>
+                <p class="ck-points-login-msg">
+                  Pour payer avec vos points fidélité, connectez-vous à votre compte ou créez-en un.
+                </p>
+                <div class="ck-points-login-btns">
+                  <button type="button" class="btn btn-accent rounded-pill px-4 fw-semibold" (click)="seConnecterPourPoints()">
+                    <i class="fa-solid fa-right-to-bracket me-2"></i>Se connecter
+                  </button>
+                  <button type="button" class="btn btn-outline-dark-ub rounded-pill px-4 fw-semibold" (click)="creerComptePourPoints()">
+                    <i class="fa-solid fa-user-plus me-2"></i>Créer un compte
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+
+            <!-- Connecté : solde de points et valeur -->
+            <ng-container *ngIf="estConnecte">
+              <div class="text-center py-3" *ngIf="chargementCarteFidelite">
+                <i class="fa-solid fa-spinner fa-spin" style="color:var(--accent)"></i>
+              </div>
+
+              <div class="ck-points-vide" *ngIf="!chargementCarteFidelite && carteFideliteChargee && !carteFidelite">
+                <i class="fa-solid fa-circle-info me-2"></i>
+                Aucune carte fidélité n'est associée à votre compte. Présentez-vous en magasin
+                avec le même e-mail ou téléphone pour l'activer.
+              </div>
+
+              <ng-container *ngIf="!chargementCarteFidelite && carteFidelite as cf">
+                <div class="ck-points-stats">
+                  <div class="ck-points-stat">
+                    <span class="ck-points-stat-lbl">Mes points</span>
+                    <span class="ck-points-stat-val">{{ cf.points | number }} pts</span>
+                  </div>
+                  <div class="ck-points-stat">
+                    <span class="ck-points-stat-lbl">Valeur de mes points</span>
+                    <span class="ck-points-stat-val">{{ formatPrix(cf.pointsValeurDT) }}</span>
+                  </div>
+                  <div class="ck-points-stat">
+                    <span class="ck-points-stat-lbl">Prix en points de la commande</span>
+                    <span class="ck-points-stat-val ck-points-stat-val--accent">{{ pointsRequis | number }} pts</span>
+                  </div>
+                </div>
+                <p class="ck-points-taux">
+                  1 point = {{ formatPrix(cf.tauxPoint) }} · Total à régler : {{ formatPrix(total) }}
+                </p>
+                <div class="ck-points-ok" *ngIf="paiementPointsPossible">
+                  <i class="fa-solid fa-circle-check me-2"></i>
+                  Il vous restera {{ (cf.points - pointsRequis) | number }} points après cette commande.
+                </div>
+                <div class="ck-points-ko" *ngIf="!paiementPointsPossible">
+                  <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                  Points insuffisants : il vous manque {{ (pointsRequis - cf.points) | number }} points. Choisissez un autre moyen de paiement.
+                </div>
+              </ng-container>
+            </ng-container>
+
+          </div>
         </div>
 
         <!-- ── Panneau Paiement en ligne : redirection vers la page hébergée Konnect ──
@@ -662,13 +745,17 @@
             <span>Total TTC</span>
             <span>{{ formatPrix(total) }}</span>
           </div>
-          <div class="ck-summary-ligne ck-summary-points" *ngIf="pointsEstimes > 0">
+          <div class="ck-summary-ligne ck-summary-points" *ngIf="pointsEstimes > 0 && moyenPaiement !== 'points'">
             <span><i class="fa-solid fa-star me-2"></i>Points fidélité gagnés</span>
             <span class="fw-semibold">+ {{ pointsEstimes }} pt{{ pointsEstimes > 1 ? 's' : '' }}</span>
           </div>
           <div class="ck-summary-ligne">
             <span>Mode de paiement</span>
             <span class="fw-semibold">{{ moyenPaiementLabel }}</span>
+          </div>
+          <div class="ck-summary-ligne ck-summary-points" *ngIf="moyenPaiement === 'points' && carteFidelite">
+            <span><i class="fa-solid fa-star me-2"></i>Points utilisés</span>
+            <span class="fw-semibold">{{ pointsRequis | number }} pts</span>
           </div>
           <div class="ck-summary-ligne" *ngIf="commandeContientFournitures">
             <span>Adresse</span>
@@ -710,14 +797,18 @@
           Retour
         </button>
         <button type="submit" class="btn btn-accent px-5 py-3 rounded-pill fw-semibold" style="font-size:15px;"
-                [disabled]="chargementCommande">
+                [disabled]="chargementCommande || (moyenPaiement === 'points' && !paiementPointsPossible)">
           <span *ngIf="!chargementCommande">
             <i class="fa-solid"
                [class.fa-lock]="moyenPaiement === 'carte'"
                [class.fa-paper-plane]="moyenPaiement === 'avis'"
                [class.fa-check]="moyenPaiement === 'livraison'"
+               [class.fa-star]="moyenPaiement === 'points'"
                style="margin-right:8px;"></i>
-            {{ moyenPaiement === 'carte' ? 'Payer en ligne' : moyenPaiement === 'avis' ? "Envoyer l'avis" : 'Confirmer la commande' }}
+            {{ moyenPaiement === 'carte' ? 'Payer en ligne'
+               : moyenPaiement === 'avis' ? "Envoyer l'avis"
+               : moyenPaiement === 'points' ? ('Payer ' + (pointsRequis | number) + ' points')
+               : 'Confirmer la commande' }}
           </span>
           <span *ngIf="chargementCommande">
             <i class="fa-solid fa-spinner fa-spin me-2"></i>

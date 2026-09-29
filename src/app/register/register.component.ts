@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../services/auth.service';
 
@@ -38,7 +38,7 @@ export class RegisterComponent {
   confirmationTouche = false;
   submitted = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private route: ActivatedRoute) {}
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
@@ -144,7 +144,9 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           this.chargement = false;
-          this.router.navigate(['/login']);
+          // returnUrl (ex: panier > « Payer avec mes points ») transmis à la connexion qui suit.
+          const retour = this.route.snapshot.queryParamMap.get('returnUrl');
+          this.router.navigate(['/login'], retour && retour.startsWith('/') ? { queryParams: { returnUrl: retour } } : {});
         },
         error: (err: HttpErrorResponse) => {
           this.chargement = false;

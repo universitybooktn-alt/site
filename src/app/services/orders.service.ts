@@ -81,8 +81,10 @@ export class OrdersService {
     commentaire?: string;
     /** Achat sans compte : coordonnées + e-mail obligatoires (voir orders.controller.js#create). */
     invite?: InviteCommande;
-  }): Observable<{ message: string; commande: Order; pointsFidelite: number }> {
-    return this.http.post<{ message: string; commande: Order; pointsFidelite: number }>(this.apiUrl, payload);
+    /** 'points' = commande réglée avec les points fidélité (compte connecté requis). */
+    modePaiement?: 'points';
+  }): Observable<{ message: string; commande: Order; pointsFidelite: number; pointsUtilises?: number; pointsRestants?: number }> {
+    return this.http.post<{ message: string; commande: Order; pointsFidelite: number; pointsUtilises?: number; pointsRestants?: number }>(this.apiUrl, payload);
   }
 
   /** Estimation des points fidélité que rapporterait le panier (affichée avant validation). */

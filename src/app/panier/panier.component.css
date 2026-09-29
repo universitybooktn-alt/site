@@ -841,3 +841,42 @@
   font-weight: 700;
 }
 
+
+/* ── Paiement en points fidélité ── */
+.ck-points-panel {
+  background: #FDF7F8;
+  border: 1px solid #F1DDE0;
+  border-radius: 14px;
+  padding: 16px;
+}
+.ck-points-login { text-align: center; padding: 6px 4px; }
+.ck-points-login-ico { font-size: 24px; color: var(--accent); margin-bottom: 8px; }
+.ck-points-login-msg { font-size: 14px; color: #3C444E; margin-bottom: 14px; }
+.ck-points-login-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.ck-points-vide { font-size: 13.5px; color: #1D4ED8; background: #EFF6FF; border-radius: 10px; padding: 10px 12px; }
+.ck-points-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.ck-points-stat {
+  background: #fff;
+  border: 1px solid #F1DDE0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.ck-points-stat-lbl { font-size: 11.5px; color: #8A929C; font-weight: 600; }
+.ck-points-stat-val { font-size: 16px; font-weight: 800; color: #1B2430; overflow-wrap: anywhere; }
+.ck-points-stat-val--accent { color: var(--accent); }
+.ck-points-taux { font-size: 12.5px; color: #6B7480; margin: 10px 0 8px; }
+.ck-points-ok, .ck-points-ko { font-size: 13.5px; font-weight: 600; border-radius: 10px; padding: 9px 12px; }
+.ck-points-ok { background: #ECFDF5; color: #166534; }
+.ck-points-ko { background: #FEF2F2; color: #B91C1C; }
+@media (max-width: 575.98px) {
+  .ck-points-stats { grid-template-columns: 1fr; }
+  .ck-points-login-btns .btn { width: 100%; }
+}
