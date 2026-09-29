@@ -46,6 +46,10 @@
                     <span class="pn-item-cat">{{ item.categorie }}</span>
                     <span class="pn-item-ref">{{ reference(item) }}</span>
                     <span *ngIf="item.variante" class="pn-item-cat" style="background:#EFF6FF;color:#2563EB;">{{ item.variante }}</span>
+                    <span *ngIf="pctCarte(item) > 0" class="pn-item-carte" [class.pn-item-carte--off]="!remiseCarteAppliquee"
+                          [title]="remiseCarteAppliquee ? 'Remise carte fidélité appliquée' : 'Remise réservée aux porteurs de la carte fidélité (compte connecté)'">
+                      <i class="fa-solid fa-id-card"></i> -{{ pctCarte(item) }}% carte fidélité
+                    </span>
                   </div>
                 </div>
                 <button (click)="supprimer(item)" class="pn-item-remove" title="Supprimer">
@@ -67,8 +71,11 @@
                   <span class="small" style="color:#9AA0A8;">{{ formatPrix(item.prix) }} / unité</span>
                 </div>
 
-                <div class="fw-bold" style="color:var(--accent);font-size:17px;">
-                  {{ formatPrix(item.prix * item.quantite) }}
+                <div class="pn-item-total">
+                  <span class="pn-item-total-old" *ngIf="remiseCarteAppliquee && pctCarte(item) > 0">{{ formatPrix(item.prix * item.quantite) }}</span>
+                  <span class="fw-bold" style="color:var(--accent);font-size:17px;">
+                    {{ formatPrix(remiseCarteAppliquee ? totalLigneRemise(item) : item.prix * item.quantite) }}
+                  </span>
                 </div>
               </div>
             </div>

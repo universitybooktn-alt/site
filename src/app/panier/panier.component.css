@@ -908,3 +908,19 @@
   font-size: 12px;
   line-height: 1.45;
 }
+
+/* ── Remise carte fidélité sur chaque ligne du panier ── */
+.pn-item-carte {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #DCFCE7;
+  color: #166534;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.pn-item-carte--off { background: #FEF3C7; color: #92400E; }
+.pn-item-total { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; }
+.pn-item-total-old { font-size: 12.5px; color: #9AA0A8; text-decoration: line-through; }

@@ -385,6 +385,19 @@ export class PanierComponent implements OnInit, OnDestroy {
   /** Le client connecté a bien une carte fidélité (la remise est donc appliquée). */
   remiseCarteAppliquee = false;
   private remiseCarteSub?: Subscription;
+  /** % de remise carte par produit du panier (renvoyé par le serveur avec l'estimation). */
+  private remiseCartePct = new Map<number, number>();
+
+  /** % de remise carte de cette ligne (0 si le produit n'en a pas). */
+  pctCarte(item: PanierItem): number {
+    return item.estDocument || item.produitId == null ? 0 : (this.remiseCartePct.get(item.produitId) || 0);
+  }
+
+  /** Total de la ligne après remise carte — même arrondi que le serveur (remiseCarteFidelite.service.js). */
+  totalLigneRemise(item: PanierItem): number {
+    const brut = item.prix * item.quantite;
+    return Math.round(brut * (1 - this.pctCarte(item) / 100) * 1000) / 1000;
+  }
 
   /** Source de vérité côté serveur (orders.controller.js#estimationRemiseCarte) — même calcul
    *  que celui appliqué au total de la commande. Best-effort : un échec laisse 0. */
@@ -392,11 +405,13 @@ export class PanierComponent implements OnInit, OnDestroy {
     this.remiseCarteSub?.unsubscribe();
     if (this.items.length === 0) {
       this.remiseCarteMontant = 0; this.remiseCarteDisponible = false; this.remiseCarteAppliquee = false;
+      this.remiseCartePct = new Map();
       return;
     }
     this.remiseCarteSub = this.ordersService.estimationRemiseCarte(this.itemsPayload()).subscribe({
       next: res => {
         this.remiseCarteMontant = res.montant || 0;
+        this.remiseCartePct = new Map((res.lignes || []).map(l => [l.produitId, l.pourcentage] as [number, number]));
         this.remiseCarteDisponible = (res.lignes || []).length > 0;
         this.remiseCarteAppliquee = !!res.carte && this.remiseCarteMontant > 0;
       },
