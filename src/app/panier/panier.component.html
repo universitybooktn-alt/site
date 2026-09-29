@@ -265,10 +265,8 @@
         <div class="ck-compte-card" *ngIf="etapeCheckout==='livraison' && !estConnecte && !compteCardMasquee">
           <div class="ck-compte-header">
             <div>
-              <div class="ck-compte-titre font-spectral">Gagnez du temps !</div>
-              <p class="ck-compte-desc">
-                Créez un compte pour enregistrer automatiquement vos informations et suivre vos commandes.
-              </p>
+              <div class="ck-compte-titre"><i class="fa-solid fa-bolt me-1"></i>Gagnez du temps !</div>
+              <p class="ck-compte-desc">Créez un compte pour enregistrer vos informations et suivre vos commandes.</p>
             </div>
             <button type="button" class="ck-compte-close" (click)="continuerInvite()" aria-label="Continuer en tant qu'invité">
               <i class="fa-solid fa-xmark"></i>
@@ -285,7 +283,10 @@
             <button type="button" class="ck-btn-compte ck-btn-compte--google" (click)="connexionGoogle()" [disabled]="oauthChargement !== null">
               <i class="fab fa-google" *ngIf="oauthChargement !== 'google'"></i>
               <i class="fa-solid fa-spinner fa-spin" *ngIf="oauthChargement === 'google'"></i>
-              Continuer avec Google
+              Google
+            </button>
+            <button type="button" class="ck-lien-invite" (click)="continuerInvite()">
+              Continuer en tant qu'invité
             </button>
             <!--button type="button" class="ck-btn-compte ck-btn-compte--facebook" (click)="connexionFacebook()" [disabled]="oauthChargement !== null">
               <i class="fab fa-facebook-f" *ngIf="oauthChargement !== 'facebook'"></i>
@@ -297,10 +298,6 @@
           <div class="alert py-2 px-3 mt-3 mb-0" *ngIf="oauthErreur" style="background:#FFFBEB;color:#92400E;border:none;">
             <i class="fa-solid fa-circle-info me-2"></i>{{ oauthErreur }}
           </div>
-
-          <button type="button" class="ck-lien-invite" *ngIf="!afficherFormulaireCompte" (click)="continuerInvite()">
-            Continuer en tant qu'invité
-          </button>
 
           <!-- ── Mini-formulaire de création de compte (section déroulante) ── -->
           <div class="ck-compte-form" *ngIf="afficherFormulaireCompte" [formGroup]="compteForm">

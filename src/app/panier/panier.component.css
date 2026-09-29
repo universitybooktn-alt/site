@@ -157,40 +157,40 @@
    CARTE "GAGNEZ DU TEMPS" (compte / Google / Facebook / invité)
 ═══════════════════════════════════════════════════════════════ */
 .ck-compte-card {
-  background: linear-gradient(150deg, #FDF2F3 0%, #F8ECEC 100%);
+  background: #FDF5F6;
   border: 1px solid #F0DCDD;
-  border-radius: 18px;
-  padding: 22px;
-  margin-bottom: 28px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 20px;
   animation: ub-fade-up .35s ease both;
 }
 .ck-compte-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 .ck-compte-titre {
-  font-size: 19px;
+  font-size: 14px;
   font-weight: 700;
   color: #1B2430;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
+.ck-compte-titre i { color: var(--accent); font-size: 12px; }
 .ck-compte-desc {
-  font-size: 13.5px;
+  font-size: 12.5px;
   color: #6B7480;
   margin: 0;
-  max-width: 460px;
 }
 .ck-compte-close {
   flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
   border: none;
-  background: rgba(255,255,255,.6);
+  background: transparent;
   color: #9AA2AB;
-  font-size: 13px;
+  font-size: 12px;
   transition: background .15s, color .15s;
 }
 .ck-compte-close:hover { background: #fff; color: var(--accent); }
@@ -198,38 +198,40 @@
 .ck-compte-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 18px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
 }
 .ck-btn-compte {
-  flex: 1 1 200px;
-  display: flex;
+  flex: 0 0 auto;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  height: 46px;
-  border-radius: 12px;
-  font-size: 13.5px;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
-  transition: transform .15s, box-shadow .15s, background .15s;
+  transition: background .15s, border-color .15s;
 }
+.ck-btn-compte i { font-size: 12px; }
 .ck-btn-compte:disabled { opacity: .6; cursor: not-allowed; }
 .ck-btn-compte--principal {
   border: none;
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 10px 22px -10px rgba(140,36,51,.5);
 }
-.ck-btn-compte--principal:hover:not(:disabled) { background: var(--accent-dark); transform: translateY(-1px); }
+.ck-btn-compte--principal:hover:not(:disabled) { background: var(--accent-dark); }
 .ck-btn-compte--secondaire {
-  border: 1.5px solid var(--accent);
+  border: 1px solid var(--accent);
   background: #fff;
   color: var(--accent);
 }
-.ck-btn-compte--secondaire:hover:not(:disabled) { background: var(--accent-light); transform: translateY(-1px); }
+.ck-btn-compte--secondaire:hover:not(:disabled) { background: var(--accent-light); }
 .ck-btn-compte--google {
-  border: 1.5px solid #E4E7EC;
+  border: 1px solid #E4E7EC;
   background: #fff;
   color: #1B2430;
 }
@@ -240,14 +242,14 @@
   background: #1877F2;
   color: #fff;
 }
-.ck-btn-compte--facebook:hover:not(:disabled) { background: #145FC4; transform: translateY(-1px); }
+.ck-btn-compte--facebook:hover:not(:disabled) { background: #145FC4; }
 
 .ck-lien-invite {
-  display: block;
-  margin: 12px auto 0;
+  margin-left: auto;
   border: none;
   background: none;
-  font-size: 12.5px;
+  padding: 0;
+  font-size: 12px;
   font-weight: 600;
   color: #6B7480;
   text-decoration: underline;
@@ -257,15 +259,16 @@
 .ck-lien-invite:hover { color: var(--accent); }
 
 .ck-compte-form {
-  margin-top: 18px;
-  padding-top: 18px;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid rgba(140,36,51,.12);
   animation: ub-fade-up .25s ease both;
 }
 
 @media (max-width: 480px) {
-  .ck-compte-card { padding: 16px; }
-  .ck-btn-compte { flex: 1 1 100%; }
+  .ck-compte-card { padding: 10px 12px; }
+  .ck-btn-compte { flex: 1 1 auto; }
+  .ck-lien-invite { margin: 4px auto 0; flex-basis: 100%; text-align: center; }
 }
 
 /* ── Section label ── */
