@@ -647,13 +647,27 @@
     padding-left: 20px;
     padding-right: 20px;
   }
+  /* Les deux boutons (Retour / Suivre-Payer) côte à côte, en version compacte. */
   .ck-footer {
-    flex-direction: column-reverse;
+    flex-direction: row;
+    gap: 8px;
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
   .ck-footer .btn {
-    width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
+    padding: 9px 10px !important;
+    font-size: 13px !important;
+    border-radius: 999px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+  .ck-footer .btn i { margin-left: 6px !important; margin-right: 6px !important; font-size: 12px; }
 }
 
 /* ══════════════════════════════════════════════════════════════
