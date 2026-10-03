@@ -1,0 +1,126 @@
+<section class="dmw-page">
+  <div class="container-xl px-4 py-4 py-lg-5">
+
+    <!-- En-tête -->
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
+      <div>
+        <h1 class="font-spectral fw-bold mb-1 dmw-title">
+          <i class="fa-solid fa-graduation-cap me-2" style="color:var(--accent)"></i>{{ 'documentMaster.title' | translate }}
+        </h1>
+        <p class="text-secondary mb-0 dmw-sub">{{ 'documentMaster.subtitle' | translate }}</p>
+      </div>
+      <span class="dmw-count-pill" *ngIf="!chargement && fiches.length">
+        <i class="fa-solid fa-book"></i>{{ fiches.length }} {{ 'documentMaster.documents' | translate }}
+      </span>
+    </div>
+
+    <!-- Chargement / erreur -->
+    <div class="d-flex justify-content-center py-5" *ngIf="chargement">
+      <i class="fa-solid fa-spinner fa-spin fa-2x" style="color:var(--accent)"></i>
+    </div>
+    <div class="dmw-empty" *ngIf="!chargement && erreur">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'documentMaster.error' | translate }}</p>
+      <button class="btn btn-accent rounded-pill px-4" (click)="charger()">{{ 'documentMaster.retry' | translate }}</button>
+    </div>
+
+    <ng-container *ngIf="!chargement && !erreur">
+
+      <div class="dmw-empty" *ngIf="!fiches.length">
+        <i class="fa-solid fa-folder-open"></i>
+        <p>{{ 'documentMaster.empty' | translate }}</p>
+      </div>
+
+      <ng-container *ngIf="fiches.length">
+        <!-- Catégories -->
+        <div class="dmw-chips">
+          <button *ngFor="let c of categoriesRacine; trackBy: trackById" class="dmw-chip"
+                  [class.active]="catActive === c.id" (click)="choisirCategorie(c.id)">
+            <i class="fa-solid fa-folder"></i>{{ c.nom }}
+            <span class="dmw-chip-count">{{ compte(c.id) }}</span>
+          </button>
+        </div>
+
+        <!-- Sous-catégories -->
+        <div class="dmw-chips dmw-chips-sub" *ngIf="sousCategoriesDe(catActive).length">
+          <button class="dmw-chip dmw-chip-sm" [class.active]="sousCatActive === ''" (click)="choisirSousCategorie('')">
+            {{ 'documentMaster.all' | translate }} <span class="dmw-chip-count">{{ compte(catActive) }}</span>
+          </button>
+          <button *ngFor="let sc of sousCategoriesDe(catActive); trackBy: trackById" class="dmw-chip dmw-chip-sm"
+                  [class.active]="sousCatActive === sc.id" (click)="choisirSousCategorie(sc.id)">
+            {{ sc.nom }} <span class="dmw-chip-count">{{ compte(catActive, sc.id) }}</span>
+          </button>
+        </div>
+
+        <!-- Recherche / année -->
+        <div class="dmw-filters">
+          <div class="input-group dmw-search">
+            <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-secondary"></i></span>
+            <input type="text" class="form-control border-start-0" [(ngModel)]="recherche" (ngModelChange)="reinitPage()"
+                   [placeholder]="'documentMaster.search' | translate">
+          </div>
+          <select class="form-select dmw-year" [(ngModel)]="filtreAnnee" (ngModelChange)="reinitPage()">
+            <option value="">{{ 'documentMaster.allYears' | translate }}</option>
+            <option *ngFor="let a of annees" [value]="a">{{ a }}</option>
+          </select>
+          <span class="dmw-result">{{ fichesFiltrees.length }} {{ 'documentMaster.results' | translate }}</span>
+        </div>
+
+        <!-- Liste -->
+        <div class="dmw-empty dmw-empty-sm" *ngIf="!fichesFiltrees.length">
+          <p>{{ 'documentMaster.noResult' | translate }}</p>
+        </div>
+
+        <div class="dmw-table-wrap" *ngIf="fichesFiltrees.length">
+          <table class="dmw-table">
+            <thead>
+              <tr>
+                <th class="tc">{{ 'documentMaster.colNumber' | translate }}</th>
+                <th>{{ 'documentMaster.colTitle' | translate }}</th>
+                <th *ngIf="!sousCatActive" class="dmw-hide-sm">{{ 'documentMaster.colType' | translate }}</th>
+                <th class="dmw-hide-sm">{{ 'documentMaster.colYear' | translate }}</th>
+                <th class="tc dmw-hide-sm">{{ 'documentMaster.colPages' | translate }}</th>
+                <th class="tr">{{ 'documentMaster.colPrice' | translate }}</th>
+                <th class="tc">{{ 'documentMaster.colActions' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let f of fichesPage; trackBy: trackById">
+                <td class="tc dmw-num">{{ f.numero || '—' }}</td>
+                <td>
+                  <div class="dmw-titre" dir="auto">{{ f.titre }}</div>
+                  <div class="dmw-meta" *ngIf="f.auteur" dir="auto"><i class="fa-regular fa-user me-1"></i>{{ f.auteur }}</div>
+                  <div class="dmw-meta dmw-show-sm">{{ f.annee }}<span *ngIf="f.annee && f.nbPages"> · </span><span *ngIf="f.nbPages">{{ f.nbPages }} {{ 'documentMaster.pagesShort' | translate }}</span></div>
+                </td>
+                <td *ngIf="!sousCatActive" class="dmw-hide-sm"><span class="dmw-pill">{{ nomCategorie(f.sousCategorie) || '—' }}</span></td>
+                <td class="dmw-hide-sm dmw-muted">{{ f.annee || '—' }}</td>
+                <td class="tc dmw-hide-sm dmw-muted">{{ f.nbPages || '—' }}</td>
+                <td class="tr dmw-prix">{{ formatPrix(f.prix) }}</td>
+                <td class="tc">
+                  <div class="dmw-actions" *ngIf="f.prix > 0">
+                    <button class="dmw-btn-add" [class.added]="ajouteId === f.id" (click)="ajouterPanier(f)"
+                            [title]="'documentMaster.addToCart' | translate">
+                      <i class="fa-solid" [class.fa-cart-plus]="ajouteId !== f.id" [class.fa-check]="ajouteId === f.id"></i>
+                      <span class="dmw-btn-lbl">{{ (ajouteId === f.id ? 'documentMaster.added' : 'documentMaster.addToCart') | translate }}</span>
+                    </button>
+                    <button class="dmw-btn-buy" (click)="commander(f)" [title]="'documentMaster.order' | translate">
+                      <i class="fa-solid fa-bolt"></i>
+                      <span class="dmw-btn-lbl">{{ 'documentMaster.order' | translate }}</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="dmw-pager" *ngIf="totalPages > 1">
+          <button class="btn btn-sm btn-light" [disabled]="page <= 1" (click)="allerPage(page - 1)"><i class="fa-solid fa-chevron-left"></i></button>
+          <span>{{ page }} / {{ totalPages }}</span>
+          <button class="btn btn-sm btn-light" [disabled]="page >= totalPages" (click)="allerPage(page + 1)"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</section>

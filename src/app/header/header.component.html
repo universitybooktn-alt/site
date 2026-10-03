@@ -69,11 +69,11 @@
     <!-- LOGO -->
     <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
       <img src="assets/logo.png" alt="University Book" height="44" style="width:auto;">
-      <span class="font-spectral fw-bold fs-5">University Book</span>
+      <span class="font-spectral fw-bold ub-brand-txt">University Book</span>
     </a>
 
     <!-- DESKTOP NAV -->
-    <div class="d-none d-xl-flex align-items-center gap-4" *ngIf="!isMobile">
+    <div class="d-none d-xl-flex align-items-center ub-nav-desktop" *ngIf="!isMobile">
 
       <!-- Accueil -->
       <a routerLink="/" routerLinkActive="ub-active" [routerLinkActiveOptions]="{exact:true}"
@@ -246,14 +246,16 @@
       </div>
       <a routerLink="/boutique" [queryParams]="{domaine:'documents', payant:'1'}" class="nav-link fw-semibold text-secondary py-2">{{ 'header.nav.paidDocs' | translate }}</a>
       <a routerLink="/boutique" [queryParams]="{domaine:'documents', gratuit:'1'}" class="nav-link fw-semibold text-secondary py-2">{{ 'header.nav.freeDocs' | translate }}</a>
+      <a routerLink="/document-master" routerLinkActive="ub-active" class="nav-link fw-semibold text-secondary py-2">{{ 'header.nav.documentMaster' | translate }}</a>
       <!-- <a routerLink="/contact" class="nav-link fw-semibold text-secondary py-2">{{ 'header.nav.contact' | translate }}</a> -->
       <!-- Visible uniquement pour un compte connecté ayant au moins une autorisation de photocopie. -->
       <a *ngIf="currentUser && aDocumentsAutorises" routerLink="/documents-autorises"
          class="nav-link fw-semibold text-secondary py-2">{{ 'header.nav.authorizedDocs' | translate }}</a>
+         
     </div>
 
     <!-- ACTIONS DESKTOP -->
-    <div class="d-none d-xl-flex align-items-center gap-3" *ngIf="!isMobile">
+    <div class="d-none d-xl-flex align-items-center ub-actions-desktop" *ngIf="!isMobile">
 
       <!-- Panier -->
       <a href="#" (click)="onCartClick($event)" class="ub-cart-link d-flex align-items-center gap-2 text-decoration-none text-dark">
@@ -263,7 +265,7 @@
             {{ cartCount }}
           </span>
         </span>
-        <span class="fw-semibold small">{{ cartTotal }} د.ت</span>
+        <span class="fw-semibold small ub-cart-total">{{ cartTotal }} د.ت</span>
       </a>
 
       <div class="vr"></div>
@@ -309,11 +311,11 @@
 
       <!-- Non connecté -->
       <ng-container *ngIf="!currentUser">
-        <a routerLink="/login" class="btn btn-outline-dark-ub d-flex align-items-center gap-2 px-4">
+        <a routerLink="/login" class="btn btn-outline-dark-ub ub-btn-login" [attr.aria-label]="'header.actions.login' | translate">
           <i class="fa-regular fa-user"></i>
-          {{ 'header.actions.login' | translate }}
+          <span class="ub-btn-login-txt">{{ 'header.actions.login' | translate }}</span>
         </a>
-        <a routerLink="/register" class="btn btn-accent px-4">
+        <a routerLink="/register" class="btn btn-accent ub-btn-register">
           {{ 'header.actions.register' | translate }}
         </a>
       </ng-container>
@@ -498,6 +500,9 @@
     </a>
     <a routerLink="/boutique" [queryParams]="{domaine:'documents', gratuit:'1'}" (click)="closeMenu()" class="d-block py-3 fw-semibold border-bottom">
       <i class="fa-solid fa-file me-2" style="color:var(--accent)"></i>{{ 'header.nav.freeDocs' | translate }}
+    </a>
+    <a routerLink="/document-master" (click)="closeMenu()" class="d-block py-3 fw-semibold border-bottom">
+      <i class="fa-solid fa-graduation-cap me-2" style="color:var(--accent)"></i>{{ 'header.nav.documentMaster' | translate }}
     </a>
     <!-- Visible uniquement pour un compte connecté ayant au moins une autorisation de photocopie
          (même condition que le lien desktop). -->

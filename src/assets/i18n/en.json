@@ -10,7 +10,8 @@
       "paidDocs": "Paid Documents",
       "freeDocs": "Free Documents",
       "authorizedDocs": "Authorized documents",
-      "contact": "Contact"
+      "contact": "Contact",
+      "documentMaster": "Document Master"
     },
     "mega": {
       "seeAll": "See all",
@@ -330,10 +331,22 @@
       "titleAccent": "University Book",
       "description": "We support Tunisian students with a rigorous selection of supplies and digital documents, a fast platform and trustworthy service, from the first click to delivery.",
       "items": {
-        "selection": { "title": "Rigorous selection", "description": "Documents and supplies chosen to support your academic success." },
-        "fast": { "title": "Fast ordering", "description": "Smooth shop, smart cart, checkout in a few clicks." },
-        "trust": { "title": "Confident shopping", "description": "Secure payment and transparent order tracking at every step." },
-        "support": { "title": "Responsive support", "description": "A team available to assist you before and after your purchase." }
+        "selection": {
+          "title": "Rigorous selection",
+          "description": "Documents and supplies chosen to support your academic success."
+        },
+        "fast": {
+          "title": "Fast ordering",
+          "description": "Smooth shop, smart cart, checkout in a few clicks."
+        },
+        "trust": {
+          "title": "Confident shopping",
+          "description": "Secure payment and transparent order tracking at every step."
+        },
+        "support": {
+          "title": "Responsive support",
+          "description": "A team available to assist you before and after your purchase."
+        }
       }
     },
     "promo": {
@@ -357,12 +370,30 @@
       "titleLine": "Our",
       "titleAccent": "advantages",
       "items": {
-        "securePayment": { "title": "Secure payment", "description": "Your transactions are 100% secure." },
-        "fastDelivery": { "title": "Fast delivery", "description": "Free delivery from 100 DT." },
-        "support247": { "title": "24/7 support", "description": "Our team is available at all times." },
-        "quality": { "title": "Quality guarantee", "description": "Authentic, quality products." },
-        "easyReturns": { "title": "Easy returns", "description": "Free returns within 14 days." },
-        "cod": { "title": "Cash on delivery", "description": "Pay upon receipt." }
+        "securePayment": {
+          "title": "Secure payment",
+          "description": "Your transactions are 100% secure."
+        },
+        "fastDelivery": {
+          "title": "Fast delivery",
+          "description": "Free delivery from 100 DT."
+        },
+        "support247": {
+          "title": "24/7 support",
+          "description": "Our team is available at all times."
+        },
+        "quality": {
+          "title": "Quality guarantee",
+          "description": "Authentic, quality products."
+        },
+        "easyReturns": {
+          "title": "Easy returns",
+          "description": "Free returns within 14 days."
+        },
+        "cod": {
+          "title": "Cash on delivery",
+          "description": "Pay upon receipt."
+        }
       }
     }
   },
@@ -452,5 +483,29 @@
       "checkout": "Checkout",
       "continueShopping": "Continue shopping"
     }
+  },
+  "documentMaster": {
+    "title": "Document Master",
+    "subtitle": "Presentations, dissertations and lectures available as photocopies, sorted by category.",
+    "documents": "documents",
+    "all": "All",
+    "search": "Search a title, an author, a number…",
+    "allYears": "All years",
+    "results": "result(s)",
+    "noResult": "No document matches your search.",
+    "empty": "No documents yet.",
+    "error": "Unable to load the documents right now.",
+    "retry": "Retry",
+    "colNumber": "No.",
+    "colTitle": "Title",
+    "colType": "Type",
+    "colYear": "Year",
+    "colPages": "Pages",
+    "colPrice": "Price",
+    "colActions": "Actions",
+    "addToCart": "Add to cart",
+    "added": "Added",
+    "order": "Order now",
+    "pagesShort": "p."
   }
 }

@@ -23,6 +23,7 @@ import { HomeComponent } from './home/home.component';
 import { BoutiqueComponent } from './boutique/boutique.component';
 import { ProduitDetailComponent } from './produit-detail/produit-detail.component';
 import { DocumentsAutorisesComponent } from './documents-autorises/documents-autorises.component';
+import { DocumentMasterComponent } from './document-master/document-master.component';
 import { PaiementRetourComponent } from './paiement-retour/paiement-retour.component';
 import { ConfirmDialogComponent } from './shared/confirm-dialog/confirm-dialog.component';
 import { LottiePlayerComponent } from './shared/lottie-player/lottie-player.component';
@@ -66,6 +67,8 @@ import { AdminProfilComponent } from './admin/profil/admin-profil.component';
     BoutiqueComponent,
     ProduitDetailComponent,
     DocumentsAutorisesComponent,
+    // Page « Document Master » (fiches gérées depuis la caisse, ajout au panier / commande).
+    DocumentMasterComponent,
     PaiementRetourComponent,
     ConfirmDialogComponent,
     LottiePlayerComponent,

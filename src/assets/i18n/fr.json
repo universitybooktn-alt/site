@@ -10,7 +10,8 @@
       "paidDocs": "Documents Payants",
       "freeDocs": "Documents Gratuits",
       "authorizedDocs": "Documents autorisés",
-      "contact": "Contact"
+      "contact": "Contact",
+      "documentMaster": "Document Master"
     },
     "mega": {
       "seeAll": "Tout voir",
@@ -330,10 +331,22 @@
       "titleAccent": "University Book",
       "description": "Nous accompagnons les étudiants tunisiens avec une sélection rigoureuse de fournitures et de documents numériques, une plateforme rapide et un service de confiance, du premier clic à la réception.",
       "items": {
-        "selection": { "title": "Sélection rigoureuse", "description": "Documents et fournitures choisis pour accompagner votre réussite universitaire." },
-        "fast": { "title": "Commande rapide", "description": "Boutique fluide, panier intelligent, paiement en quelques clics." },
-        "trust": { "title": "Achat en confiance", "description": "Paiement sécurisé et suivi de commande transparent à chaque étape." },
-        "support": { "title": "Support réactif", "description": "Une équipe disponible pour vous accompagner avant et après l'achat." }
+        "selection": {
+          "title": "Sélection rigoureuse",
+          "description": "Documents et fournitures choisis pour accompagner votre réussite universitaire."
+        },
+        "fast": {
+          "title": "Commande rapide",
+          "description": "Boutique fluide, panier intelligent, paiement en quelques clics."
+        },
+        "trust": {
+          "title": "Achat en confiance",
+          "description": "Paiement sécurisé et suivi de commande transparent à chaque étape."
+        },
+        "support": {
+          "title": "Support réactif",
+          "description": "Une équipe disponible pour vous accompagner avant et après l'achat."
+        }
       }
     },
     "promo": {
@@ -357,12 +370,30 @@
       "titleLine": "Nos",
       "titleAccent": "avantages",
       "items": {
-        "securePayment": { "title": "Paiement sécurisé", "description": "Vos transactions sont 100 % sécurisées." },
-        "fastDelivery": { "title": "Livraison rapide", "description": "Livraison gratuite à partir de 100 DT." },
-        "support247": { "title": "Support 24/7", "description": "Notre équipe est disponible à tout moment." },
-        "quality": { "title": "Garantie qualité", "description": "Produits authentiques et de qualité." },
-        "easyReturns": { "title": "Retours faciles", "description": "Retour gratuit sous 14 jours." },
-        "cod": { "title": "Paiement à la livraison", "description": "Paiement lors de la réception." }
+        "securePayment": {
+          "title": "Paiement sécurisé",
+          "description": "Vos transactions sont 100 % sécurisées."
+        },
+        "fastDelivery": {
+          "title": "Livraison rapide",
+          "description": "Livraison gratuite à partir de 100 DT."
+        },
+        "support247": {
+          "title": "Support 24/7",
+          "description": "Notre équipe est disponible à tout moment."
+        },
+        "quality": {
+          "title": "Garantie qualité",
+          "description": "Produits authentiques et de qualité."
+        },
+        "easyReturns": {
+          "title": "Retours faciles",
+          "description": "Retour gratuit sous 14 jours."
+        },
+        "cod": {
+          "title": "Paiement à la livraison",
+          "description": "Paiement lors de la réception."
+        }
       }
     }
   },
@@ -452,5 +483,29 @@
       "checkout": "Commander",
       "continueShopping": "Continuer les achats"
     }
+  },
+  "documentMaster": {
+    "title": "Document Master",
+    "subtitle": "Exposés, mémoires et conférences disponibles en photocopie, classés par catégorie.",
+    "documents": "documents",
+    "all": "Tous",
+    "search": "Rechercher un titre, un auteur, un n°…",
+    "allYears": "Toutes les années",
+    "results": "résultat(s)",
+    "noResult": "Aucun document ne correspond à votre recherche.",
+    "empty": "Aucun document pour le moment.",
+    "error": "Impossible de charger les documents pour le moment.",
+    "retry": "Réessayer",
+    "colNumber": "N°",
+    "colTitle": "Titre",
+    "colType": "Type",
+    "colYear": "Année",
+    "colPages": "Pages",
+    "colPrice": "Prix",
+    "colActions": "Actions",
+    "addToCart": "Ajouter au panier",
+    "added": "Ajouté",
+    "order": "Commander",
+    "pagesShort": "p."
   }
 }

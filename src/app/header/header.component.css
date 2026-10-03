@@ -538,3 +538,88 @@ button.ub-mobile-row {
   background: #F0F1F4;
   margin: 6px 4px;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BARRE PRINCIPALE — mise en page « pro » sur une seule ligne
+   Logo | menu centré | actions. Jamais de retour à la ligne : sur les écrans
+   moyens (1200–1399px) les éléments secondaires se compactent en icônes.
+   ══════════════════════════════════════════════════════════════════════════ */
+.ub-navbar { padding-top: 10px; padding-bottom: 10px; }
+.ub-navbar > .container-xl {
+  flex-wrap: nowrap;
+  gap: 24px;
+}
+@media (min-width: 1400px) {
+  .ub-navbar > .container-xl { max-width: 1440px; }
+}
+
+.ub-navbar .navbar-brand { flex-shrink: 0; margin-right: 0; }
+.ub-brand-txt { font-size: 1.3rem; letter-spacing: -.01em; white-space: nowrap; color: #1B2430; }
+
+/* Menu : centré, espacement fluide, libellés sur une ligne */
+.ub-nav-desktop {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  gap: clamp(16px, 1.7vw, 30px);
+}
+.ub-nav-desktop .nav-link {
+  white-space: nowrap;
+  font-size: 15px;
+  letter-spacing: -.005em;
+  color: #4B5563 !important;
+}
+.ub-nav-desktop .nav-link:hover,
+.ub-nav-desktop .nav-link.ub-active { color: #1B2430 !important; }
+.ub-nav-desktop .nav-link.ub-active { font-weight: 700 !important; }
+
+/* Actions : compactes, hauteur et arrondi homogènes */
+.ub-actions-desktop {
+  flex-shrink: 0;
+  gap: 14px;
+}
+.ub-actions-desktop .vr { height: 26px; align-self: center; opacity: .15; }
+.ub-btn-login,
+.ub-btn-register {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ub-btn-register { box-shadow: 0 8px 18px -10px rgba(140, 36, 51, .55); }
+
+/* Écrans moyens : les libellés secondaires laissent place à leurs icônes */
+@media (max-width: 1399.98px) {
+  .ub-navbar > .container-xl { gap: 18px; }
+  .ub-brand-txt { font-size: 1.15rem; }
+  .ub-nav-desktop .nav-link { font-size: 14.5px; }
+  .ub-actions-desktop { gap: 10px; }
+  .ub-cart-total { display: none; }
+  .ub-btn-login-txt { display: none; }
+  .ub-btn-login { width: 40px; padding: 0; }
+  .ub-btn-register { padding: 0 16px; }
+}
+
+/* Ajustements fins selon la largeur réelle disponible (5 entrées de menu + actions) */
+@media (min-width: 1600px) {
+  .ub-navbar > .container-xl { max-width: 1520px; }
+}
+@media (min-width: 1400px) and (max-width: 1599.98px) {
+  .ub-nav-desktop { gap: 22px; }
+  .ub-cart-total { display: none; }
+}
+@media (max-width: 1399.98px) {
+  .ub-nav-desktop { gap: 14px; }
+  .ub-nav-desktop .nav-link { font-size: 14px; }
+  .ub-brand-txt { font-size: 1.05rem; }
+}
+/* Très juste au-dessus du passage en menu mobile : le logo seul suffit. */
+@media (max-width: 1279.98px) {
+  .ub-brand-txt { display: none; }
+}
