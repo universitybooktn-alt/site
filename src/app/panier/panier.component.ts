@@ -866,6 +866,8 @@ export class PanierComponent implements OnInit, OnDestroy {
       error: err => {
         this.chargementCommande = false;
         this.erreurCommande = err.error?.message || "Erreur lors de l'initialisation du paiement en ligne.";
+        // Rendre l'erreur visible : sans ça, seul le 400 apparaissait dans la console.
+        setTimeout(() => document.querySelector('.ck-erreur-bas')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 0);
       }
     });
   }

@@ -579,8 +579,8 @@
               <i class="fa-solid fa-circle-check ck-radio-check"></i>
             </label>
           </div>
-          <div class="col-12 col-md-6">
-            <!-- Paiement en ligne (Konnect) désactivé temporairement : carte non cliquable. -->
+          <!--div class="col-12 col-md-6">
+            <!-- Paiement en ligne (Konnect) désactivé temporairement : carte non cliquable. ->
             <label class="ck-radio-card" aria-disabled="true" title="Paiement en ligne temporairement indisponible"
                    style="opacity:.5;cursor:not-allowed;pointer-events:none;filter:grayscale(1);">
               <input type="radio" value="carte" class="ck-radio-input" disabled>
@@ -592,7 +592,7 @@
                 <div class="ck-radio-desc">Temporairement indisponible</div>
               </div>
             </label>
-          </div>
+          </div-->
           <!-- Paiement en ligne Flouci : affiché seulement si configuré côté serveur -->
           <div class="col-12 col-md-6" *ngIf="flouciDisponible">
             <label class="ck-radio-card" [class.selected]="moyenPaiement === 'flouci'">
@@ -840,6 +840,12 @@
             <span>Téléphone</span>
             <span class="fw-semibold">{{ checkoutForm.get('telephone')?.value || '—' }}</span>
           </div>
+        </div>
+
+        <!-- Erreur de commande répétée juste au-dessus du bouton de paiement : l'alerte du haut
+             est hors écran quand on clique « Payer » en bas de l'étape. -->
+        <div class="alert alert-danger py-2 px-3 mt-3 mb-0 ck-erreur-bas" *ngIf="erreurCommande" role="alert">
+          <i class="fa-solid fa-circle-exclamation me-2"></i>{{ erreurCommande }}
         </div>
 
         </ng-container><!-- /Étape 2 : Paiement -->
