@@ -12,7 +12,7 @@ import { AvisService } from '../services/avis.service';
 import { MesAchatsService, CarteFidelite } from '../services/mes-achats.service';
 import { GOUVERNORATS_TUNISIE, delegationsPourGouvernorat } from '../shared/tunisie-geo.data';
 
-type MoyenPaiement = 'livraison' | 'carte' | 'avis' | 'points';
+type MoyenPaiement = 'livraison' | 'carte' | 'flouci' | 'avis' | 'points';
 /** Étapes du wizard de commande — la 3ᵉ étape (confirmation) réutilise l'écran existant
  *  piloté par `orderConfirmed`, elle n'a pas besoin d'une valeur dédiée ici. */
 type EtapeCheckout = 'livraison' | 'paiement';
@@ -59,6 +59,10 @@ export class PanierComponent implements OnInit, OnDestroy {
   /** Paiement en ligne (Konnect) : redirection en cours vers la page de paiement hébergée —
    *  distinct de `chargementCommande` (paiement à la livraison, enregistrement direct). */
   redirectionKonnectEnCours = false;
+  /** Nom de la passerelle vers laquelle on redirige (texte du bouton pendant la redirection). */
+  passerelleRedirection: 'Konnect' | 'Flouci' = 'Konnect';
+  /** Flouci configuré côté serveur (voir GET /api/payments/methodes) — sinon l'option est masquée. */
+  flouciDisponible = false;
 
   /** Déblocage par avis (voir initierAvisDeblocage) : commande envoyée mais en attente de
    *  validation admin — l'écran de confirmation affiche un message différent d'un achat réglé. */
@@ -96,6 +100,17 @@ export class PanierComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.paymentsService.methodes().subscribe({
+      next: m => {
+        this.flouciDisponible = !!m.flouci;
+        // Tunnel déjà ouvert (lien ?checkout=1) avec un document payant : bascule sur Flouci
+        // plutôt que de laisser présélectionné le paiement Konnect, désactivé.
+        if (this.flouciDisponible && this.isCheckoutOpen && this.moyenPaiement === 'carte') {
+          this.checkoutForm.get('moyenPaiement')?.setValue('flouci');
+        }
+      },
+      error: () => { this.flouciDisponible = false; }
+    });
     this.cartSub = this.cartService.items$.subscribe(items => {
       this.items = items;
       this.chargerRemiseCarte();
@@ -270,7 +285,9 @@ export class PanierComponent implements OnInit, OnDestroy {
     // Un panier contenant un document payant ne peut jamais être réglé à la livraison (voir
     // commandeContientDocumentPayant) — Konnect reste le mode par défaut le plus naturel dans ce
     // cas, "avis" restant un choix explicite du client plutôt qu'une valeur pré-sélectionnée.
-    const moyenPaiementDefaut: MoyenPaiement = this.commandeContientDocumentPayant ? 'carte' : 'livraison';
+    const moyenPaiementDefaut: MoyenPaiement = this.commandeContientDocumentPayant
+      ? (this.flouciDisponible ? 'flouci' : 'carte')
+      : 'livraison';
     this.checkoutForm.reset({ typeLivraison: 'domicile', moyenPaiement: moyenPaiementDefaut, avisNote: 5 });
     this.majValidateursAvis(moyenPaiementDefaut);
 
@@ -593,6 +610,7 @@ export class PanierComponent implements OnInit, OnDestroy {
     const labels: Record<MoyenPaiement, string> = {
       livraison: 'Paiement à la livraison',
       carte: 'Paiement en ligne (Konnect)',
+      flouci: 'Paiement en ligne (Flouci)',
       avis: 'Déblocage par avis (en attente de validation)',
       points: this.carteFidelite && !this.pointsCouvrentTout ? 'Points fidélité + Paiement à la livraison' : 'Points fidélité',
     };
@@ -758,7 +776,9 @@ export class PanierComponent implements OnInit, OnDestroy {
       }
       this.enregistrerCommande(true);
     } else if (this.moyenPaiement === 'carte') {
-      this.initierPaiementEnLigne();
+      this.initierPaiementEnLigne('konnect');
+    } else if (this.moyenPaiement === 'flouci') {
+      this.initierPaiementEnLigne('flouci');
     } else if (this.moyenPaiement === 'avis') {
       this.initierAvisDeblocage();
     } else {
@@ -832,9 +852,13 @@ export class PanierComponent implements OnInit, OnDestroy {
    * il s'agit d'un domaine externe). Le panier n'est vidé qu'après un paiement confirmé — voir
    * PaiementRetourComponent, qui gère le retour succès/échec.
    */
-  private initierPaiementEnLigne(): void {
+  private initierPaiementEnLigne(passerelle: 'konnect' | 'flouci'): void {
     this.chargementCommande = true;
-    this.paymentsService.initierKonnect(this.payloadCommande()).subscribe({
+    this.passerelleRedirection = passerelle === 'flouci' ? 'Flouci' : 'Konnect';
+    const init$ = passerelle === 'flouci'
+      ? this.paymentsService.initierFlouci(this.payloadCommande())
+      : this.paymentsService.initierKonnect(this.payloadCommande());
+    init$.subscribe({
       next: res => {
         this.redirectionKonnectEnCours = true;
         window.location.href = res.payUrl;

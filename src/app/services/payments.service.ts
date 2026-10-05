@@ -20,8 +20,27 @@ export interface StatutKonnect {
   /** '' = paiement à la livraison (n'a pas de notion de paiement en ligne) ; sinon le cycle de
    *  vie Konnect : 'en_attente' (webhook pas encore reçu/traité), 'reussi', 'echoue'. */
   statutPaiementEnLigne: '' | 'en_attente' | 'reussi' | 'echoue';
+  /** Passerelle utilisée ('konnect' | 'flouci'), '' hors paiement en ligne. */
+  passerelle?: '' | 'konnect' | 'flouci';
   total: number;
 }
+
+/** Passerelles de paiement en ligne réellement configurées côté serveur. */
+export interface MethodesPaiement {
+  konnect: boolean;
+  flouci: boolean;
+}
+
+type PayloadPaiementEnLigne = {
+  items: OrderItem[];
+  total: number;
+  paiement: string;
+  adresseLivraison: string;
+  gouvernorat?: string;
+  delegation?: string;
+  commentaire?: string;
+  invite?: InviteCommande;
+};
 
 @Injectable({ providedIn: 'root' })
 export class PaymentsService {
@@ -54,10 +73,23 @@ export class PaymentsService {
     );
   }
 
-  /** Page de retour Konnect : statut de la commande, sans authentification (gardé par le couple
-   *  numéro + jeton — voir payments.controller.js#statutKonnect, peut être un client invité). */
+  /** Paiement en ligne Flouci — même payload et même réponse que initierKonnect(). */
+  initierFlouci(payload: PayloadPaiementEnLigne): Observable<{ message: string; payUrl: string; numero: string; jetonSuivi: string }> {
+    return this.http.post<{ message: string; payUrl: string; numero: string; jetonSuivi: string }>(
+      `${this.apiUrl}/flouci/initier`, payload
+    );
+  }
+
+  /** Passerelles disponibles (clés configurées sur le serveur) — le checkout n'affiche que celles-ci. */
+  methodes(): Observable<MethodesPaiement> {
+    return this.http.get<MethodesPaiement>(`${this.apiUrl}/methodes`);
+  }
+
+  /** Page de retour (Konnect ou Flouci) : statut de la commande, sans authentification (gardé par
+   *  le couple numéro + jeton — voir payments.controller.js#statut, peut être un client invité).
+   *  Le serveur revérifie le paiement auprès de la passerelle tant qu'il est en attente. */
   statutKonnect(numero: string, jeton: string): Observable<StatutKonnect> {
     const params = new HttpParams().set('numero', numero).set('jeton', jeton);
-    return this.http.get<StatutKonnect>(`${this.apiUrl}/konnect/statut`, { params });
+    return this.http.get<StatutKonnect>(`${this.apiUrl}/statut`, { params });
   }
 }

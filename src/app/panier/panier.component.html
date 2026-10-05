@@ -593,6 +593,20 @@
               </div>
             </label>
           </div>
+          <!-- Paiement en ligne Flouci : affiché seulement si configuré côté serveur -->
+          <div class="col-12 col-md-6" *ngIf="flouciDisponible">
+            <label class="ck-radio-card" [class.selected]="moyenPaiement === 'flouci'">
+              <input type="radio" formControlName="moyenPaiement" value="flouci" class="ck-radio-input">
+              <div class="ck-radio-icon" style="background:#FFF4ED;">
+                <span style="font-size:18px;">🟠</span>
+              </div>
+              <div>
+                <div class="ck-radio-title">Paiement en ligne — Flouci</div>
+                <div class="ck-radio-desc">Carte bancaire ou portefeuille Flouci</div>
+              </div>
+              <i class="fa-solid fa-circle-check ck-radio-check"></i>
+            </label>
+          </div>
           <div class="col-12 col-md-6" *ngIf="deblocageParAvisPossible">
             <label class="ck-radio-card" [class.selected]="moyenPaiement === 'avis'">
               <input type="radio" formControlName="moyenPaiement" value="avis" class="ck-radio-input">
@@ -713,6 +727,17 @@
             <p class="mb-0" style="font-size:14px;color:#3C444E;">
               Vous serez redirigé·e vers la page de paiement sécurisée <strong>Konnect</strong>
               pour régler par carte bancaire ou e-DINAR.
+            </p>
+          </div>
+        </div>
+
+        <!-- ── Panneau Flouci : redirection vers la page de paiement hébergée Flouci ── -->
+        <div class="ck-payment-fields" *ngIf="moyenPaiement === 'flouci'">
+          <div class="ck-payment-panel ck-payment-panel--carte mt-3 text-center py-4">
+            <i class="fa-solid fa-lock mb-2" style="font-size:22px;color:#F26522"></i>
+            <p class="mb-0" style="font-size:14px;color:#3C444E;">
+              Vous serez redirigé·e vers la page de paiement sécurisée <strong>Flouci</strong>
+              pour régler par carte bancaire ou avec votre portefeuille Flouci.
             </p>
           </div>
         </div>
@@ -842,19 +867,20 @@
                 [disabled]="chargementCommande || (moyenPaiement === 'points' && !paiementPointsPossible)">
           <span *ngIf="!chargementCommande">
             <i class="fa-solid"
-               [class.fa-lock]="moyenPaiement === 'carte'"
+               [class.fa-lock]="moyenPaiement === 'carte' || moyenPaiement === 'flouci'"
                [class.fa-paper-plane]="moyenPaiement === 'avis'"
                [class.fa-check]="moyenPaiement === 'livraison'"
                [class.fa-star]="moyenPaiement === 'points'"
                style="margin-right:8px;"></i>
             {{ moyenPaiement === 'carte' ? 'Payer en ligne'
+               : moyenPaiement === 'flouci' ? 'Payer avec Flouci'
                : moyenPaiement === 'avis' ? "Envoyer l'avis"
                : moyenPaiement === 'points' ? (pointsCouvrentTout ? ('Payer ' + (pointsUtilisables | number) + ' points') : 'Confirmer la commande')
                : 'Confirmer la commande' }}
           </span>
           <span *ngIf="chargementCommande">
             <i class="fa-solid fa-spinner fa-spin me-2"></i>
-            {{ redirectionKonnectEnCours ? 'Redirection vers Konnect...' : "Enregistrement..." }}
+            {{ redirectionKonnectEnCours ? ('Redirection vers ' + passerelleRedirection + '...') : "Enregistrement..." }}
           </span>
         </button>
       </div>
