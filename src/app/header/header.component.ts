@@ -54,9 +54,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
    *  le sous-menu au survol de "Fournitures scolaires" dans le mega-menu Boutique. */
   categoriesCaisse: CategorieCaisseDto[] = [];
 
-  /** Rayon actif du mega-menu Boutique (colonne de droite) : piloté au survol du rail.
-   *  Valeurs : 'documents' | 'soutenance' | 'fournitures' | 'jeux' | 'payants' | 'gratuits'. */
-  megaDomaine: 'documents' | 'soutenance' | 'fournitures' | 'jeux' | 'payants' | 'gratuits' = 'documents';
+  /** Rayon actif du mega-menu Boutique (colonne de droite) : piloté au survol du rail. */
+  megaDomaine: 'soutenance' | 'fournitures' | 'jeux' | 'informatique' = 'fournitures';
+
+  /** Rayon actif du mega-menu « Documents universitaires » : catégories de documents du site,
+   *  documents payants / gratuits, Document Master, documents autorisés. */
+  megaDocs: 'documents' | 'payants' | 'gratuits' | 'master' | 'autorises' = 'documents';
 
   /** Catégories exclues de la liste "Fournitures scolaires" du mega-menu uniquement : elles ont
    *  déjà leur propre entrée dédiée dans le menu (liens Soutenance / Jeux) ou relèvent d'un autre
@@ -77,8 +80,23 @@ export class HeaderComponent implements OnInit, OnDestroy {
     const nomsDocuments = this.nomsCategoriesDocuments;
     return this.categoriesCaisse.filter(c => {
       const nom = (c.nom || '').trim().toLowerCase();
-      return !this.categoriesCaisseExclues.includes(nom) && !nomsDocuments.has(nom);
+      return !this.categoriesCaisseExclues.includes(nom) && !nomsDocuments.has(nom)
+        && !this.estCategorieInformatique(c);
     });
+  }
+
+  /** "Accessoire informatique" a sa propre entrée dans le rail du mega-menu (à côté de
+   *  Fournitures / Soutenance / Jeux) : elle est donc retirée de la liste Fournitures. Libellé
+   *  caisse en texte libre ("Accessoir informatique", "ACCESSOIRES INFORMATIQUE"…) → on matche
+   *  sur "informatique". */
+  private estCategorieInformatique(c: CategorieCaisseDto): boolean {
+    return (c.nom || '').trim().toLowerCase().includes('informatique');
+  }
+
+  /** Catégorie caisse "Accessoire informatique" (null si absente) : fournit le lien et les
+   *  sous-catégories de l'entrée dédiée du rail. */
+  get categorieInformatique(): CategorieCaisseDto | null {
+    return this.categoriesCaisse.find(c => this.estCategorieInformatique(c)) || null;
   }
 
   /** Équivalent tactile du survol desktop : clés des sections dépliées de l'accordéon Boutique

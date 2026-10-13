@@ -239,6 +239,19 @@
   .ubm2 { left: -280px; grid-template-columns: 200px 1fr; }
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   DOCUMENTS UNIVERSITAIRES (desktop) — même mega-menu que la Boutique (.ubm2),
+   simplement décalé vers la gauche : le déclencheur est plus à droite dans la
+   barre, le panneau reste ainsi aligné au même endroit à l'écran.
+   ══════════════════════════════════════════════════════════════════════════ */
+.ub-docs-item .ubm2 { left: -120px; }
+@media (max-width: 1300px) {
+  .ub-docs-item .ubm2 { left: -320px; }
+}
+@media (max-width: 1160px) {
+  .ub-docs-item .ubm2 { left: -400px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ubm2 { transition: opacity .12s ease, visibility .12s ease; }
   .ubm2 *, .ubm2 *::before { transition: none !important; }

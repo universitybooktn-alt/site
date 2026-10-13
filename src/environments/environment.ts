@@ -1,11 +1,11 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://backend-eta-ruby-55.vercel.app/api',
+  apiUrl: 'https://caisse-backend-eosin.vercel.app/api',
   //apiUrl: 'https://caisse-backend-mn10.onrender.com/api',
   // Doit pointer sur le même backend que `apiUrl` (sans /api) : sinon les images
   // servies en chemin relatif (/uploads/...) ne se résolvent pas. Les nouvelles
   // images produits/packs sont sur R2 en URL absolue et ignorent cette valeur.
-  fileBaseUrl: 'https://backend-eta-ruby-55.vercel.app',
+  fileBaseUrl: 'https://caisse-backend-eosin.vercel.app',
   // Client ID PUBLIC (pas un secret) du widget "Continuer avec Google" (voir app/login/). Vide
   // par défaut : le bouton Google reste alors masqué plutôt que d'échouer (voir
   // login.component.ts#initGoogle). À renseigner avec le Client ID créé sur

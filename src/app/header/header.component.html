@@ -83,29 +83,25 @@
 
       <!-- Boutique : mega-menu au survol (souris). Panneau large : rail des rayons à gauche,
            catégories du rayon survolé en colonnes à droite (megaDomaine pilote l'affichage),
-           pied CTA. Documents = CategoriesSiteService ; Fournitures = CategoriesCaisseService
-           (hors Soutenance/Jeux/Livre) ; les autres rayons = lien direct + court descriptif. -->
+           pied CTA. Fournitures = CategoriesCaisseService (hors Soutenance/Jeux/Livre) ; les
+           autres rayons = lien direct + court descriptif. Les documents (catégories du site,
+           payants, gratuits…) sont dans le menu « Documents universitaires » ci-dessous. -->
       <div class="ub-boutique-item position-relative">
         <a routerLinkActive="ub-active"
            class="nav-link fw-semibold text-secondary py-2 d-flex align-items-center gap-1">
           {{ 'header.nav.shop' | translate }}
           <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
         </a>
-        <!--a routerLink="/boutique" routerLinkActive="ub-active"
-           class="nav-link fw-semibold text-secondary py-2 d-flex align-items-center gap-1">
-          {{ 'header.nav.shop' | translate }}
-          <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
-        </a-->
 
-        <div class="ubm2" (mouseleave)="megaDomaine = 'documents'">
+        <div class="ubm2" (mouseleave)="megaDomaine = 'fournitures'">
 
           <!-- RAIL : rayons -->
           <div class="ubm2-rail">
-            <a class="ubm2-rail-item" [class.is-active]="megaDomaine === 'documents'"
-               (mouseenter)="megaDomaine = 'documents'" (focus)="megaDomaine = 'documents'"
-               routerLink="/boutique" [queryParams]="{domaine:'documents'}">
-              <i class="fa-solid fa-book"></i>
-              <span class="ubm2-rail-label">{{ 'header.mega.rail.documents' | translate }}</span>
+            <a class="ubm2-rail-item" [class.is-active]="megaDomaine === 'fournitures'"
+               (mouseenter)="megaDomaine = 'fournitures'" (focus)="megaDomaine = 'fournitures'"
+               routerLink="/boutique" [queryParams]="{domaine:'fournitures'}">
+              <i class="fa-solid fa-pen-ruler"></i>
+              <span class="ubm2-rail-label">{{ 'header.mega.rail.supplies' | translate }}</span>
               <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
             </a>
             <a class="ubm2-rail-item" [class.is-active]="megaDomaine === 'soutenance'"
@@ -115,13 +111,6 @@
               <span class="ubm2-rail-label">{{ 'header.mega.rail.soutenance' | translate }}</span>
               <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
             </a>
-            <a class="ubm2-rail-item" [class.is-active]="megaDomaine === 'fournitures'"
-               (mouseenter)="megaDomaine = 'fournitures'" (focus)="megaDomaine = 'fournitures'"
-               routerLink="/boutique" [queryParams]="{domaine:'fournitures'}">
-              <i class="fa-solid fa-pen-ruler"></i>
-              <span class="ubm2-rail-label">{{ 'header.mega.rail.supplies' | translate }}</span>
-              <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
-            </a>
             <a class="ubm2-rail-item" [class.is-active]="megaDomaine === 'jeux'"
                (mouseenter)="megaDomaine = 'jeux'" (focus)="megaDomaine = 'jeux'"
                routerLink="/boutique" [queryParams]="{domaine:'fournitures', categorie:'Jeux'}">
@@ -129,46 +118,17 @@
               <span class="ubm2-rail-label">{{ 'header.mega.rail.games' | translate }}</span>
               <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
             </a>
-            <a class="ubm2-rail-item" [class.is-active]="megaDomaine === 'payants'"
-               (mouseenter)="megaDomaine = 'payants'" (focus)="megaDomaine = 'payants'"
-               routerLink="/boutique" [queryParams]="{domaine:'documents', payant:'1'}">
-              <i class="fa-solid fa-file-invoice"></i>
-              <span class="ubm2-rail-label">{{ 'header.mega.rail.paidDocs' | translate }}</span>
-              <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
-            </a>
-            <a class="ubm2-rail-item" [class.is-active]="megaDomaine === 'gratuits'"
-               (mouseenter)="megaDomaine = 'gratuits'" (focus)="megaDomaine = 'gratuits'"
-               routerLink="/boutique" [queryParams]="{domaine:'documents', gratuit:'1'}">
-              <i class="fa-solid fa-gift"></i>
-              <span class="ubm2-rail-label">{{ 'header.mega.rail.freeDocs' | translate }}</span>
+            <a class="ubm2-rail-item" [class.is-active]="megaDomaine === 'informatique'"
+               (mouseenter)="megaDomaine = 'informatique'" (focus)="megaDomaine = 'informatique'"
+               routerLink="/boutique" [queryParams]="{domaine:'fournitures', categorie: categorieInformatique?.nom || 'Accessoir informatique'}">
+              <i class="fa-solid fa-computer-mouse"></i>
+              <span class="ubm2-rail-label">{{ 'header.mega.rail.computer' | translate }}</span>
               <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
             </a>
           </div>
 
           <!-- BODY : catégories du rayon actif -->
           <div class="ubm2-body">
-
-            <!-- Documents -->
-            <div class="ubm2-domain" *ngIf="megaDomaine === 'documents'">
-              <div class="ubm2-domain-head">
-                <h3>{{ 'header.mega.title.documents' | translate }}</h3>
-                <a routerLink="/boutique" [queryParams]="{domaine:'documents'}" class="ubm2-see-all">
-                  {{ 'header.mega.seeAll' | translate }} <i class="fa-solid fa-arrow-right"></i>
-                </a>
-              </div>
-              <div class="ubm2-cols" *ngIf="categoriesSite.length; else docVide">
-                <div class="ubm2-col" *ngFor="let cat of categoriesSite">
-                  <a routerLink="/boutique" [queryParams]="{domaine:'documents', categorie: cat.nom}"
-                     class="ubm2-col-head">{{ formatLabel(cat.nom) }}</a>
-                  <a *ngFor="let sc of cat.sousCategories"
-                     routerLink="/boutique" [queryParams]="{domaine:'documents', categorie: cat.nom, sousCategorie: sc.nom}"
-                     class="ubm2-col-link">{{ formatLabel(sc.nom) }}</a>
-                </div>
-              </div>
-              <ng-template #docVide>
-                <p class="ubm2-blurb">{{ 'header.mega.blurb.documents' | translate }}</p>
-              </ng-template>
-            </div>
 
             <!-- Fournitures scolaires -->
             <div class="ubm2-domain" *ngIf="megaDomaine === 'fournitures'">
@@ -214,26 +174,24 @@
               <p class="ubm2-blurb">{{ 'header.mega.blurb.games' | translate }}</p>
             </div>
 
-            <!-- Documents payants -->
-            <div class="ubm2-domain" *ngIf="megaDomaine === 'payants'">
+            <!-- Accessoire informatique (catégorie caisse dédiée, retirée de Fournitures) -->
+            <div class="ubm2-domain" *ngIf="megaDomaine === 'informatique'">
               <div class="ubm2-domain-head">
-                <h3>{{ 'header.mega.title.paidDocs' | translate }}</h3>
-                <a routerLink="/boutique" [queryParams]="{domaine:'documents', payant:'1'}" class="ubm2-see-all">
+                <h3>{{ 'header.mega.title.computer' | translate }}</h3>
+                <a routerLink="/boutique" [queryParams]="{domaine:'fournitures', categorie: categorieInformatique?.nom || 'Accessoir informatique'}" class="ubm2-see-all">
                   {{ 'header.mega.seeAll' | translate }} <i class="fa-solid fa-arrow-right"></i>
                 </a>
               </div>
-              <p class="ubm2-blurb">{{ 'header.mega.blurb.paidDocs' | translate }}</p>
-            </div>
-
-            <!-- Documents gratuits -->
-            <div class="ubm2-domain" *ngIf="megaDomaine === 'gratuits'">
-              <div class="ubm2-domain-head">
-                <h3>{{ 'header.mega.title.freeDocs' | translate }}</h3>
-                <a routerLink="/boutique" [queryParams]="{domaine:'documents', gratuit:'1'}" class="ubm2-see-all">
-                  {{ 'header.mega.seeAll' | translate }} <i class="fa-solid fa-arrow-right"></i>
-                </a>
+              <div class="ubm2-cols" *ngIf="categorieInformatique?.sousCategories?.length; else infoVide">
+                <div class="ubm2-col">
+                  <a *ngFor="let sc of categorieInformatique!.sousCategories"
+                     routerLink="/boutique" [queryParams]="{domaine:'fournitures', categorie: categorieInformatique!.nom, sousCategorie: sc}"
+                     class="ubm2-col-link">{{ formatLabel(sc) }}</a>
+                </div>
               </div>
-              <p class="ubm2-blurb">{{ 'header.mega.blurb.freeDocs' | translate }}</p>
+              <ng-template #infoVide>
+                <p class="ubm2-blurb">{{ 'header.mega.blurb.computer' | translate }}</p>
+              </ng-template>
             </div>
           </div>
 
@@ -244,14 +202,138 @@
           </a>
         </div>
       </div>
-      <a routerLink="/boutique" [queryParams]="{domaine:'documents', payant:'1'}" class="nav-link fw-semibold text-secondary py-2">{{ 'header.nav.paidDocs' | translate }}</a>
-      <a routerLink="/boutique" [queryParams]="{domaine:'documents', gratuit:'1'}" class="nav-link fw-semibold text-secondary py-2">{{ 'header.nav.freeDocs' | translate }}</a>
-      <a routerLink="/document-master" routerLinkActive="ub-active" class="nav-link fw-semibold text-secondary py-2">{{ 'header.nav.documentMaster' | translate }}</a>
+
+      <!-- Documents universitaires : même mega-menu que Boutique (rail à gauche, contenu du
+           rayon survolé à droite, megaDocs pilote l'affichage). « Documents » liste les
+           catégories / sous-catégories du site (CategoriesSiteService). -->
+      <div class="ub-boutique-item ub-docs-item position-relative">
+        <a class="nav-link fw-semibold text-secondary py-2 d-flex align-items-center gap-1" tabindex="0">
+          {{ 'header.nav.universityDocs' | translate }}
+          <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
+        </a>
+
+        <div class="ubm2" (mouseleave)="megaDocs = 'documents'">
+
+          <!-- RAIL -->
+          <div class="ubm2-rail">
+            <a class="ubm2-rail-item" [class.is-active]="megaDocs === 'documents'"
+               (mouseenter)="megaDocs = 'documents'" (focus)="megaDocs = 'documents'"
+               routerLink="/boutique" [queryParams]="{domaine:'documents'}">
+              <i class="fa-solid fa-book"></i>
+              <span class="ubm2-rail-label">{{ 'header.mega.rail.documents' | translate }}</span>
+              <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
+            </a>
+            <a class="ubm2-rail-item" [class.is-active]="megaDocs === 'payants'"
+               (mouseenter)="megaDocs = 'payants'" (focus)="megaDocs = 'payants'"
+               routerLink="/boutique" [queryParams]="{domaine:'documents', payant:'1'}">
+              <i class="fa-solid fa-file-invoice"></i>
+              <span class="ubm2-rail-label">{{ 'header.mega.rail.paidDocs' | translate }}</span>
+              <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
+            </a>
+            <a class="ubm2-rail-item" [class.is-active]="megaDocs === 'gratuits'"
+               (mouseenter)="megaDocs = 'gratuits'" (focus)="megaDocs = 'gratuits'"
+               routerLink="/boutique" [queryParams]="{domaine:'documents', gratuit:'1'}">
+              <i class="fa-solid fa-gift"></i>
+              <span class="ubm2-rail-label">{{ 'header.mega.rail.freeDocs' | translate }}</span>
+              <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
+            </a>
+            <a class="ubm2-rail-item" [class.is-active]="megaDocs === 'master'"
+               (mouseenter)="megaDocs = 'master'" (focus)="megaDocs = 'master'"
+               routerLink="/document-master">
+              <i class="fa-solid fa-user-graduate"></i>
+              <span class="ubm2-rail-label">{{ 'header.nav.documentMaster' | translate }}</span>
+              <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
+            </a>
+            <!-- Visible uniquement pour un compte connecté ayant au moins une autorisation de photocopie. -->
+            <a *ngIf="currentUser && aDocumentsAutorises"
+               class="ubm2-rail-item" [class.is-active]="megaDocs === 'autorises'"
+               (mouseenter)="megaDocs = 'autorises'" (focus)="megaDocs = 'autorises'"
+               routerLink="/documents-autorises">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span class="ubm2-rail-label">{{ 'header.nav.authorizedDocs' | translate }}</span>
+              <i class="fa-solid fa-chevron-right ubm2-rail-arrow"></i>
+            </a>
+          </div>
+
+          <!-- BODY -->
+          <div class="ubm2-body">
+
+            <!-- Documents : catégories / sous-catégories du site -->
+            <div class="ubm2-domain" *ngIf="megaDocs === 'documents'">
+              <div class="ubm2-domain-head">
+                <h3>{{ 'header.mega.title.documents' | translate }}</h3>
+                <a routerLink="/boutique" [queryParams]="{domaine:'documents'}" class="ubm2-see-all">
+                  {{ 'header.mega.seeAll' | translate }} <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+              <div class="ubm2-cols" *ngIf="categoriesSite.length; else docVide">
+                <div class="ubm2-col" *ngFor="let cat of categoriesSite">
+                  <a routerLink="/boutique" [queryParams]="{domaine:'documents', categorie: cat.nom}"
+                     class="ubm2-col-head">{{ formatLabel(cat.nom) }}</a>
+                  <a *ngFor="let sc of cat.sousCategories"
+                     routerLink="/boutique" [queryParams]="{domaine:'documents', categorie: cat.nom, sousCategorie: sc.nom}"
+                     class="ubm2-col-link">{{ formatLabel(sc.nom) }}</a>
+                </div>
+              </div>
+              <ng-template #docVide>
+                <p class="ubm2-blurb">{{ 'header.mega.blurb.documents' | translate }}</p>
+              </ng-template>
+            </div>
+
+            <!-- Documents payants -->
+            <div class="ubm2-domain" *ngIf="megaDocs === 'payants'">
+              <div class="ubm2-domain-head">
+                <h3>{{ 'header.mega.title.paidDocs' | translate }}</h3>
+                <a routerLink="/boutique" [queryParams]="{domaine:'documents', payant:'1'}" class="ubm2-see-all">
+                  {{ 'header.mega.seeAll' | translate }} <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+              <p class="ubm2-blurb">{{ 'header.mega.blurb.paidDocs' | translate }}</p>
+            </div>
+
+            <!-- Documents gratuits -->
+            <div class="ubm2-domain" *ngIf="megaDocs === 'gratuits'">
+              <div class="ubm2-domain-head">
+                <h3>{{ 'header.mega.title.freeDocs' | translate }}</h3>
+                <a routerLink="/boutique" [queryParams]="{domaine:'documents', gratuit:'1'}" class="ubm2-see-all">
+                  {{ 'header.mega.seeAll' | translate }} <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+              <p class="ubm2-blurb">{{ 'header.mega.blurb.freeDocs' | translate }}</p>
+            </div>
+
+            <!-- Document Master -->
+            <div class="ubm2-domain" *ngIf="megaDocs === 'master'">
+              <div class="ubm2-domain-head">
+                <h3>{{ 'header.nav.documentMaster' | translate }}</h3>
+                <a routerLink="/document-master" class="ubm2-see-all">
+                  {{ 'header.mega.seeAll' | translate }} <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+              <p class="ubm2-blurb">{{ 'header.univDocs.masterDesc' | translate }}</p>
+            </div>
+
+            <!-- Documents autorisés -->
+            <div class="ubm2-domain" *ngIf="megaDocs === 'autorises'">
+              <div class="ubm2-domain-head">
+                <h3>{{ 'header.nav.authorizedDocs' | translate }}</h3>
+                <a routerLink="/documents-autorises" class="ubm2-see-all">
+                  {{ 'header.mega.seeAll' | translate }} <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </div>
+              <p class="ubm2-blurb">{{ 'header.univDocs.authorizedDesc' | translate }}</p>
+            </div>
+          </div>
+
+          <!-- FOOT -->
+          <a routerLink="/boutique" [queryParams]="{domaine:'documents'}" class="ubm2-foot">
+            {{ 'header.univDocs.footAll' | translate }}
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
       <!-- <a routerLink="/contact" class="nav-link fw-semibold text-secondary py-2">{{ 'header.nav.contact' | translate }}</a> -->
-      <!-- Visible uniquement pour un compte connecté ayant au moins une autorisation de photocopie. -->
-      <a *ngIf="currentUser && aDocumentsAutorises" routerLink="/documents-autorises"
-         class="nav-link fw-semibold text-secondary py-2">{{ 'header.nav.authorizedDocs' | translate }}</a>
-         
+
     </div>
 
     <!-- ACTIONS DESKTOP -->
@@ -408,48 +490,6 @@
 
       <div class="ub-mobile-subaccordion" *ngIf="isMobileExpanded('boutique')">
 
-        <!-- Documents -->
-        <button *ngIf="categoriesSite.length; else lienDocuments" type="button" class="ub-mobile-row ub-mobile-row--indent1 ub-mobile-row--toggle" (click)="toggleMobileExpand('doc', $event)" [attr.aria-expanded]="isMobileExpanded('doc')">
-          <span class="ub-mobile-row-link"><i class="fa-solid fa-book me-2"></i>{{ 'header.mega.rail.documents' | translate }}</span>
-          <span class="ub-mobile-row-toggle" aria-hidden="true">
-            <i class="fa-solid fa-chevron-down" [class.ub-rotated]="isMobileExpanded('doc')"></i>
-          </span>
-        </button>
-        <ng-template #lienDocuments>
-          <a routerLink="/boutique" [queryParams]="{domaine:'documents'}" (click)="closeMenu()" class="ub-mobile-row-link d-block ub-mobile-row--indent1">
-            <i class="fa-solid fa-book me-2"></i>{{ 'header.mega.rail.documents' | translate }}
-          </a>
-        </ng-template>
-        <div class="ub-mobile-subaccordion" *ngIf="isMobileExpanded('doc')">
-          <ng-container *ngFor="let cat of categoriesSite">
-            <div class="ub-mobile-row ub-mobile-row--indent2">
-              <a routerLink="/boutique" [queryParams]="{domaine:'documents', categorie: cat.nom}" (click)="closeMenu()" class="ub-mobile-row-link">{{ formatLabel(cat.nom) }}</a>
-              <button *ngIf="cat.sousCategories.length" type="button" class="ub-mobile-row-toggle" (click)="toggleMobileExpand('doc:'+cat.nom, $event)" [attr.aria-expanded]="isMobileExpanded('doc:'+cat.nom)">
-                <i class="fa-solid fa-chevron-down" [class.ub-rotated]="isMobileExpanded('doc:'+cat.nom)"></i>
-              </button>
-            </div>
-            <div class="ub-mobile-subaccordion" *ngIf="isMobileExpanded('doc:'+cat.nom)">
-              <ng-container *ngFor="let sc of cat.sousCategories">
-                <div class="ub-mobile-row ub-mobile-row--indent3">
-                  <a routerLink="/boutique" [queryParams]="{domaine:'documents', categorie: cat.nom, sousCategorie: sc.nom}" (click)="closeMenu()" class="ub-mobile-row-link">{{ formatLabel(sc.nom) }}</a>
-                  <button *ngIf="sc.sousSousCategories.length" type="button" class="ub-mobile-row-toggle" (click)="toggleMobileExpand('doc:'+cat.nom+':'+sc.nom, $event)" [attr.aria-expanded]="isMobileExpanded('doc:'+cat.nom+':'+sc.nom)">
-                    <i class="fa-solid fa-chevron-down" [class.ub-rotated]="isMobileExpanded('doc:'+cat.nom+':'+sc.nom)"></i>
-                  </button>
-                </div>
-                <div class="ub-mobile-subaccordion" *ngIf="isMobileExpanded('doc:'+cat.nom+':'+sc.nom)">
-                  <a *ngFor="let ssc of sc.sousSousCategories"
-                     routerLink="/boutique"
-                     [queryParams]="{domaine:'documents', categorie: cat.nom, sousCategorie: sc.nom, sousSousCategorie: ssc}"
-                     (click)="closeMenu()"
-                     class="ub-mobile-row-link d-block ub-mobile-row--indent4">
-                    {{ formatLabel(ssc) }}
-                  </a>
-                </div>
-              </ng-container>
-            </div>
-          </ng-container>
-        </div>
-
         <!-- Soutenance -->
         <a routerLink="/boutique" [queryParams]="{domaine:'fournitures', categorie:'Soutenance'}" (click)="closeMenu()" class="ub-mobile-row-link d-block ub-mobile-row--indent1">
           <i class="fa-solid fa-graduation-cap me-2"></i>{{ 'header.mega.rail.soutenance' | translate }}
@@ -492,24 +532,83 @@
         <a routerLink="/boutique" [queryParams]="{domaine:'fournitures', categorie:'Jeux'}" (click)="closeMenu()" class="ub-mobile-row-link d-block ub-mobile-row--indent1">
           <i class="fa-solid fa-dice me-2"></i>{{ 'header.mega.rail.games' | translate }}
         </a>
+
+        <!-- Accessoire informatique -->
+        <a routerLink="/boutique" [queryParams]="{domaine:'fournitures', categorie: categorieInformatique?.nom || 'Accessoir informatique'}" (click)="closeMenu()" class="ub-mobile-row-link d-block ub-mobile-row--indent1">
+          <i class="fa-solid fa-computer-mouse me-2"></i>{{ 'header.mega.rail.computer' | translate }}
+        </a>
       </div>
     </div>
 
-    <a routerLink="/boutique" [queryParams]="{domaine:'documents', payant:'1'}" (click)="closeMenu()" class="d-block py-3 fw-semibold border-bottom">
-      <i class="fa-solid fa-file-invoice me-2" style="color:var(--accent)"></i>{{ 'header.nav.paidDocs' | translate }}
-    </a>
-    <a routerLink="/boutique" [queryParams]="{domaine:'documents', gratuit:'1'}" (click)="closeMenu()" class="d-block py-3 fw-semibold border-bottom">
-      <i class="fa-solid fa-file me-2" style="color:var(--accent)"></i>{{ 'header.nav.freeDocs' | translate }}
-    </a>
-    <a routerLink="/document-master" (click)="closeMenu()" class="d-block py-3 fw-semibold border-bottom">
-      <i class="fa-solid fa-graduation-cap me-2" style="color:var(--accent)"></i>{{ 'header.nav.documentMaster' | translate }}
-    </a>
-    <!-- Visible uniquement pour un compte connecté ayant au moins une autorisation de photocopie
-         (même condition que le lien desktop). -->
-    <a *ngIf="currentUser && aDocumentsAutorises" routerLink="/documents-autorises" (click)="closeMenu()"
-       class="d-block py-3 fw-semibold border-bottom">
-      <i class="fa-solid fa-shield-halved me-2" style="color:var(--accent)"></i>{{ 'header.nav.authorizedDocs' | translate }}
-    </a>
+    <!-- Documents universitaires : groupe dépliable au tap (équivalent tactile du menu desktop). -->
+    <div class="border-bottom">
+      <button type="button" class="ub-mobile-row ub-mobile-row--toggle" (click)="toggleMobileExpand('univDocs', $event)" [attr.aria-expanded]="isMobileExpanded('univDocs')">
+        <span class="ub-mobile-row-link py-3 fw-semibold">
+          <i class="fa-solid fa-book-open me-2" style="color:var(--accent)"></i>{{ 'header.nav.universityDocs' | translate }}
+        </span>
+        <span class="ub-mobile-row-toggle" aria-hidden="true">
+          <i class="fa-solid fa-chevron-down" [class.ub-rotated]="isMobileExpanded('univDocs')"></i>
+        </span>
+      </button>
+      <div class="ub-mobile-subaccordion" *ngIf="isMobileExpanded('univDocs')">
+        <!-- Documents (catégories du site) -->
+        <button *ngIf="categoriesSite.length; else lienDocuments" type="button" class="ub-mobile-row ub-mobile-row--indent1 ub-mobile-row--toggle" (click)="toggleMobileExpand('doc', $event)" [attr.aria-expanded]="isMobileExpanded('doc')">
+          <span class="ub-mobile-row-link"><i class="fa-solid fa-book me-2"></i>{{ 'header.mega.rail.documents' | translate }}</span>
+          <span class="ub-mobile-row-toggle" aria-hidden="true">
+            <i class="fa-solid fa-chevron-down" [class.ub-rotated]="isMobileExpanded('doc')"></i>
+          </span>
+        </button>
+        <ng-template #lienDocuments>
+          <a routerLink="/boutique" [queryParams]="{domaine:'documents'}" (click)="closeMenu()" class="ub-mobile-row-link d-block ub-mobile-row--indent1">
+            <i class="fa-solid fa-book me-2"></i>{{ 'header.mega.rail.documents' | translate }}
+          </a>
+        </ng-template>
+        <div class="ub-mobile-subaccordion" *ngIf="isMobileExpanded('doc')">
+          <ng-container *ngFor="let cat of categoriesSite">
+            <div class="ub-mobile-row ub-mobile-row--indent2">
+              <a routerLink="/boutique" [queryParams]="{domaine:'documents', categorie: cat.nom}" (click)="closeMenu()" class="ub-mobile-row-link">{{ formatLabel(cat.nom) }}</a>
+              <button *ngIf="cat.sousCategories.length" type="button" class="ub-mobile-row-toggle" (click)="toggleMobileExpand('doc:'+cat.nom, $event)" [attr.aria-expanded]="isMobileExpanded('doc:'+cat.nom)">
+                <i class="fa-solid fa-chevron-down" [class.ub-rotated]="isMobileExpanded('doc:'+cat.nom)"></i>
+              </button>
+            </div>
+            <div class="ub-mobile-subaccordion" *ngIf="isMobileExpanded('doc:'+cat.nom)">
+              <ng-container *ngFor="let sc of cat.sousCategories">
+                <div class="ub-mobile-row ub-mobile-row--indent3">
+                  <a routerLink="/boutique" [queryParams]="{domaine:'documents', categorie: cat.nom, sousCategorie: sc.nom}" (click)="closeMenu()" class="ub-mobile-row-link">{{ formatLabel(sc.nom) }}</a>
+                  <button *ngIf="sc.sousSousCategories.length" type="button" class="ub-mobile-row-toggle" (click)="toggleMobileExpand('doc:'+cat.nom+':'+sc.nom, $event)" [attr.aria-expanded]="isMobileExpanded('doc:'+cat.nom+':'+sc.nom)">
+                    <i class="fa-solid fa-chevron-down" [class.ub-rotated]="isMobileExpanded('doc:'+cat.nom+':'+sc.nom)"></i>
+                  </button>
+                </div>
+                <div class="ub-mobile-subaccordion" *ngIf="isMobileExpanded('doc:'+cat.nom+':'+sc.nom)">
+                  <a *ngFor="let ssc of sc.sousSousCategories"
+                     routerLink="/boutique"
+                     [queryParams]="{domaine:'documents', categorie: cat.nom, sousCategorie: sc.nom, sousSousCategorie: ssc}"
+                     (click)="closeMenu()"
+                     class="ub-mobile-row-link d-block ub-mobile-row--indent4">
+                    {{ formatLabel(ssc) }}
+                  </a>
+                </div>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+        <a routerLink="/boutique" [queryParams]="{domaine:'documents', payant:'1'}" (click)="closeMenu()" class="ub-mobile-row-link d-block ub-mobile-row--indent1">
+          <i class="fa-solid fa-file-invoice me-2"></i>{{ 'header.nav.paidDocs' | translate }}
+        </a>
+        <a routerLink="/boutique" [queryParams]="{domaine:'documents', gratuit:'1'}" (click)="closeMenu()" class="ub-mobile-row-link d-block ub-mobile-row--indent1">
+          <i class="fa-solid fa-gift me-2"></i>{{ 'header.nav.freeDocs' | translate }}
+        </a>
+        <a routerLink="/document-master" (click)="closeMenu()" class="ub-mobile-row-link d-block ub-mobile-row--indent1">
+          <i class="fa-solid fa-graduation-cap me-2"></i>{{ 'header.nav.documentMaster' | translate }}
+        </a>
+        <!-- Visible uniquement pour un compte connecté ayant au moins une autorisation de photocopie
+             (même condition que le menu desktop). -->
+        <a *ngIf="currentUser && aDocumentsAutorises" routerLink="/documents-autorises" (click)="closeMenu()"
+           class="ub-mobile-row-link d-block ub-mobile-row--indent1">
+          <i class="fa-solid fa-shield-halved me-2"></i>{{ 'header.nav.authorizedDocs' | translate }}
+        </a>
+      </div>
+    </div>
     <a routerLink="/contact" (click)="closeMenu()" class="d-block py-3 fw-semibold">
       <i class="fa-solid fa-envelope me-2" style="color:var(--accent)"></i>{{ 'header.nav.contact' | translate }}
     </a>

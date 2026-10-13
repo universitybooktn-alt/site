@@ -11,17 +11,26 @@
       "freeDocs": "Documents Gratuits",
       "authorizedDocs": "Documents autorisés",
       "contact": "Contact",
-      "documentMaster": "Document Master"
+      "documentMaster": "Document Master",
+      "universityDocs": "Documents"
+    },
+    "univDocs": {
+      "paidDesc": "Cours, examens et résumés à acheter",
+      "freeDesc": "Documents à télécharger gratuitement",
+      "masterDesc": "Mémoires, exposés et conférences en photocopie",
+      "authorizedDesc": "Livres dont la photocopie vous est autorisée",
+      "footAll": "Voir tous les documents"
     },
     "mega": {
       "seeAll": "Tout voir",
       "footAll": "Voir toute la boutique",
       "rail": {
-        "documents": "Documents",
+        "documents": "Documents universitaires",
         "soutenance": "Soutenance",
         "supplies": "Fournitures scolaires",
         "games": "Jeux",
-        "paidDocs": "Documents payants",
+        "computer": "Accessoire informatique",
+        "paidDocs": "Documents payants (PDF)",
         "freeDocs": "Documents gratuits"
       },
       "title": {
@@ -29,6 +38,7 @@
         "supplies": "Fournitures scolaires",
         "soutenance": "Soutenance",
         "games": "Jeux",
+        "computer": "Accessoire informatique",
         "paidDocs": "Documents payants",
         "freeDocs": "Documents gratuits"
       },
@@ -37,6 +47,7 @@
         "supplies": "Écriture, papier, classement, dessin technique et petit matériel de classe.",
         "soutenance": "Impression et reliure de mémoires, pages de garde et accessoires de présentation.",
         "games": "Jeux éducatifs, jeux de société, puzzles et jeux de cartes.",
+        "computer": "Souris, claviers, clés USB, câbles et petits accessoires pour ordinateur.",
         "paidDocs": "Contenus premium vérifiés — accès immédiat après achat.",
         "freeDocs": "Ressources en accès libre partagées par la communauté étudiante."
       }

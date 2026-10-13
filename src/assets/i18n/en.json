@@ -11,17 +11,26 @@
       "freeDocs": "Free Documents",
       "authorizedDocs": "Authorized documents",
       "contact": "Contact",
-      "documentMaster": "Document Master"
+      "documentMaster": "Document Master",
+      "universityDocs": "Documents"
+    },
+    "univDocs": {
+      "paidDesc": "Courses, exams and summaries to buy",
+      "freeDesc": "Documents to download for free",
+      "masterDesc": "Theses, presentations and lectures as photocopies",
+      "authorizedDesc": "Books you are authorized to photocopy",
+      "footAll": "See all documents"
     },
     "mega": {
       "seeAll": "See all",
       "footAll": "Browse the whole shop",
       "rail": {
-        "documents": "Documents",
+        "documents": "University documents",
         "soutenance": "Thesis defense",
         "supplies": "School supplies",
         "games": "Games",
-        "paidDocs": "Paid documents",
+        "computer": "Computer accessories",
+        "paidDocs": "Paid documents (PDF)",
         "freeDocs": "Free documents"
       },
       "title": {
@@ -29,6 +38,7 @@
         "supplies": "School supplies",
         "soutenance": "Thesis defense",
         "games": "Games",
+        "computer": "Computer accessories",
         "paidDocs": "Paid documents",
         "freeDocs": "Free documents"
       },
@@ -37,6 +47,7 @@
         "supplies": "Writing, paper, filing, technical drawing and small classroom tools.",
         "soutenance": "Printing and binding of dissertations, cover pages and presentation accessories.",
         "games": "Educational games, board games, puzzles and card games.",
+        "computer": "Mice, keyboards, USB drives, cables and small computer accessories.",
         "paidDocs": "Verified premium content — instant access after purchase.",
         "freeDocs": "Open-access resources shared by the student community."
       }
