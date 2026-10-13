@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { CartService } from '../services/cart.service';
 import { CompareService } from '../services/compare.service';
 import { BoutiqueFavoritesService } from '../services/boutique-favorites.service';
-import { CatalogueService, Produit, estProduitDocument, estCategorieJeux, estCategorieSoutenance } from '../services/catalogue.service';
+import { CatalogueService, Produit, estProduitDocument, estCategorieJeux, estCategorieSoutenance, estCategorieInformatique } from '../services/catalogue.service';
 import { CategoriesSiteService } from '../services/categories-site.service';
 import { DocumentsService } from '../services/documents.service';
 import { AuthService } from '../services/auth.service';
@@ -261,6 +261,7 @@ export class BoutiqueComponent implements OnInit, OnDestroy {
     const cible = (categorie || '').trim().toLowerCase();
     if (cible === 'soutenance') return estCategorieSoutenance(p.categorie);
     if (cible === 'jeux' || cible === 'jeu') return estCategorieJeux(p.categorie);
+    if (estCategorieInformatique(cible)) return estCategorieInformatique(p.categorie);
     return (p.categorie || '').localeCompare(categorie || '', 'fr', { sensitivity: 'base' }) === 0;
   }
 

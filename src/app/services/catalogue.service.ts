@@ -242,6 +242,13 @@ export function estCategorieJeux(categorie: string | undefined | null): boolean 
 export function estCategorieSoutenance(categorie: string | undefined | null): boolean {
   return (categorie || '').trim().toLowerCase().includes('soutenance');
 }
+/** Accessoires informatiques : le menu pointe sur la catégorie caisse ("accessoir informatique")
+ *  alors que les produits publiés portent la catégorie site choisie en caisse ("accesoir info") —
+ *  libellés libres, on matche donc "informatique" ou le mot "info". */
+export function estCategorieInformatique(categorie: string | undefined | null): boolean {
+  const c = (categorie || '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
+  return c.includes('informatique') || /\binfo\b/.test(c);
+}
 
 @Injectable({ providedIn: 'root' })
 export class CatalogueService {
