@@ -85,7 +85,7 @@ export class DocumentMasterComponent implements OnInit, OnDestroy {
         this.categories = res.categories || [];
         this.fiches = res.fiches || [];
         this.categoriesRacine = this.categories.filter(c => !c.parent);
-        this.catDefaut = this.categoriesRacine[0]?.id || '';
+        this.catDefaut = ''; // catégorie par défaut : « Tous »
         this.catActive = this.catDefaut;
         this.lireUrl();
         this.chargement = false;
