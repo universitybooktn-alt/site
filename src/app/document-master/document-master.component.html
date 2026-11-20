@@ -32,43 +32,99 @@
       </div>
 
       <ng-container *ngIf="fiches.length">
-        <!-- Catégories -->
-        <div class="dmw-chips">
-          <button *ngFor="let c of categoriesRacine; trackBy: trackById" class="dmw-chip"
-                  [class.active]="catActive === c.id" (click)="choisirCategorie(c.id)">
-            <i class="fa-solid fa-folder"></i>{{ c.nom }}
-            <span class="dmw-chip-count">{{ compte(c.id) }}</span>
-          </button>
-        </div>
-
-        <!-- Sous-catégories -->
-        <div class="dmw-chips dmw-chips-sub" *ngIf="sousCategoriesDe(catActive).length">
-          <button class="dmw-chip dmw-chip-sm" [class.active]="sousCatActive === ''" (click)="choisirSousCategorie('')">
-            {{ 'documentMaster.all' | translate }} <span class="dmw-chip-count">{{ compte(catActive) }}</span>
-          </button>
-          <button *ngFor="let sc of sousCategoriesDe(catActive); trackBy: trackById" class="dmw-chip dmw-chip-sm"
-                  [class.active]="sousCatActive === sc.id" (click)="choisirSousCategorie(sc.id)">
-            {{ sc.nom }} <span class="dmw-chip-count">{{ compte(catActive, sc.id) }}</span>
-          </button>
-        </div>
-
-        <!-- Recherche / année -->
-        <div class="dmw-filters">
-          <div class="input-group dmw-search">
-            <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-secondary"></i></span>
-            <input type="text" class="form-control border-start-0" [(ngModel)]="recherche" (ngModelChange)="reinitPage()"
-                   [placeholder]="'documentMaster.search' | translate">
+        <!-- Filtres -->
+        <div class="dmw-panel">
+          <div class="dmw-bar">
+            <div class="dmw-search">
+              <i class="fa-solid fa-magnifying-glass dmw-search-ico"></i>
+              <input type="search" class="dmw-search-input" [ngModel]="rechercheSaisie" (ngModelChange)="surSaisie($event)"
+                     (keydown.escape)="effacerRecherche()" [placeholder]="'documentMaster.search' | translate"
+                     [attr.aria-label]="'documentMaster.fSearchLbl' | translate">
+              <button type="button" class="dmw-search-clear" *ngIf="rechercheSaisie" (click)="effacerRecherche()"
+                      [title]="'documentMaster.fClear' | translate"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <button type="button" class="dmw-toggle" (click)="panneauOuvert = !panneauOuvert"
+                    [class.open]="panneauOuvert" [attr.aria-expanded]="panneauOuvert">
+              <i class="fa-solid fa-sliders"></i>{{ 'documentMaster.fFilters' | translate }}
+              <span class="dmw-badge" *ngIf="filtresActifs.length">{{ filtresActifs.length }}</span>
+            </button>
           </div>
-          <select class="form-select dmw-year" [(ngModel)]="filtreAnnee" (ngModelChange)="reinitPage()">
-            <option value="">{{ 'documentMaster.allYears' | translate }}</option>
-            <option *ngFor="let a of annees" [value]="a">{{ a }}</option>
-          </select>
-          <span class="dmw-result">{{ fichesFiltrees.length }} {{ 'documentMaster.results' | translate }}</span>
+
+          <div class="dmw-body" [class.open]="panneauOuvert">
+            <div class="dmw-group">
+              <div class="dmw-label"><i class="fa-solid fa-folder-tree"></i>{{ 'documentMaster.fCategory' | translate }}</div>
+              <div class="dmw-chips">
+                <button type="button" class="dmw-chip" [class.active]="catActive === ''" [attr.aria-pressed]="catActive === ''"
+                        (click)="choisirCategorie('')">
+                  {{ 'documentMaster.all' | translate }}
+                  <span class="dmw-chip-count">{{ compte('') }}</span>
+                </button>
+                <button type="button" *ngFor="let c of categoriesRacine; trackBy: trackById" class="dmw-chip"
+                        [class.active]="catActive === c.id" [class.dim]="!compte(c.id)" [attr.aria-pressed]="catActive === c.id"
+                        (click)="choisirCategorie(c.id)">
+                  <i class="fa-solid fa-folder"></i>{{ c.nom }}
+                  <span class="dmw-chip-count">{{ compte(c.id) }}</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="dmw-group" *ngIf="sousCategories.length">
+              <div class="dmw-label"><i class="fa-solid fa-tags"></i>{{ 'documentMaster.fType' | translate }}</div>
+              <div class="dmw-chips dmw-chips-sub">
+                <button type="button" class="dmw-chip dmw-chip-sm" [class.active]="sousCatActive === ''"
+                        [attr.aria-pressed]="sousCatActive === ''" (click)="choisirSousCategorie('')">
+                  {{ 'documentMaster.all' | translate }} <span class="dmw-chip-count">{{ compte(catActive) }}</span>
+                </button>
+                <button type="button" *ngFor="let sc of sousCategories; trackBy: trackById" class="dmw-chip dmw-chip-sm"
+                        [class.active]="sousCatActive === sc.id" [class.dim]="!compte(catActive, sc.id)"
+                        [attr.aria-pressed]="sousCatActive === sc.id" (click)="choisirSousCategorie(sc.id)">
+                  {{ sc.nom }} <span class="dmw-chip-count">{{ compte(catActive, sc.id) }}</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="dmw-selects">
+              <label class="dmw-field">
+                <span class="dmw-label"><i class="fa-regular fa-calendar"></i>{{ 'documentMaster.fYear' | translate }}</span>
+                <select class="dmw-select" [ngModel]="filtreAnnee" (ngModelChange)="changerAnnee($event)">
+                  <option value="">{{ 'documentMaster.allYears' | translate }}</option>
+                  <option *ngFor="let a of annees" [value]="a">{{ a }}</option>
+                </select>
+              </label>
+              <label class="dmw-field">
+                <span class="dmw-label"><i class="fa-solid fa-arrow-down-wide-short"></i>{{ 'documentMaster.fSort' | translate }}</span>
+                <select class="dmw-select" [ngModel]="tri" (ngModelChange)="changerTri($event)">
+                  <option *ngFor="let t of tris" [value]="t.id">{{ t.cle | translate }}</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <!-- Résumé + filtres actifs -->
+          <div class="dmw-summary">
+            <span class="dmw-result" aria-live="polite"><strong>{{ fichesFiltrees.length }}</strong> {{ 'documentMaster.results' | translate }}</span>
+            <ng-container *ngIf="filtresActifs.length">
+              <span class="dmw-sep"></span>
+              <span class="dmw-active-lbl">{{ 'documentMaster.fActive' | translate }}</span>
+              <button type="button" *ngFor="let f of filtresActifs" class="dmw-tag" (click)="retirerFiltre(f)"
+                      [title]="'documentMaster.fRemove' | translate">
+                <i class="fa-solid" [ngClass]="f.icone"></i>
+                <span dir="auto">{{ f.cleLibelle ? (f.cleLibelle | translate) : f.libelle }}</span>
+                <i class="fa-solid fa-xmark dmw-tag-x"></i>
+              </button>
+              <button type="button" class="dmw-reset" (click)="reinitialiserFiltres()">
+                <i class="fa-solid fa-rotate-left"></i>{{ 'documentMaster.fReset' | translate }}
+              </button>
+            </ng-container>
+          </div>
         </div>
 
         <!-- Liste -->
         <div class="dmw-empty dmw-empty-sm" *ngIf="!fichesFiltrees.length">
-          <p>{{ 'documentMaster.noResult' | translate }}</p>
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+          <p class="mb-1">{{ 'documentMaster.noResult' | translate }}</p>
+          <p class="small mb-3">{{ 'documentMaster.fNoResultHint' | translate }}</p>
+          <button type="button" class="dmw-reset" (click)="reinitialiserFiltres()"><i class="fa-solid fa-rotate-left"></i>{{ 'documentMaster.fReset' | translate }}</button>
         </div>
 
         <div class="dmw-table-wrap" *ngIf="fichesFiltrees.length">

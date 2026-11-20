@@ -517,6 +517,22 @@
     "addToCart": "Add to cart",
     "added": "Added",
     "order": "Order now",
-    "pagesShort": "p."
+    "pagesShort": "p.",
+    "fCategory": "Category",
+    "fType": "Document type",
+    "fYear": "Year",
+    "fSort": "Sort by",
+    "fSortDefault": "Relevance",
+    "fSortYear": "Newest first",
+    "fSortPriceAsc": "Price: low to high",
+    "fSortPriceDesc": "Price: high to low",
+    "fSortTitle": "Title (A-Z)",
+    "fActive": "Active filters",
+    "fReset": "Reset filters",
+    "fFilters": "Filters",
+    "fRemove": "Remove this filter",
+    "fClear": "Clear search",
+    "fSearchLbl": "Search",
+    "fNoResultHint": "Try changing or removing some filters."
   }
 }

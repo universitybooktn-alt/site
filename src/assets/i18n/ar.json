@@ -517,6 +517,22 @@
     "addToCart": "أضف إلى السلة",
     "added": "تمت الإضافة",
     "order": "اطلب الآن",
-    "pagesShort": "ص"
+    "pagesShort": "ص",
+    "fCategory": "الصنف",
+    "fType": "نوع الوثيقة",
+    "fYear": "السنة",
+    "fSort": "ترتيب حسب",
+    "fSortDefault": "الأكثر صلة",
+    "fSortYear": "الأحدث",
+    "fSortPriceAsc": "السعر: من الأقل",
+    "fSortPriceDesc": "السعر: من الأعلى",
+    "fSortTitle": "العنوان (أ-ي)",
+    "fActive": "المرشحات النشطة",
+    "fReset": "إعادة تعيين المرشحات",
+    "fFilters": "المرشحات",
+    "fRemove": "إزالة هذا المرشح",
+    "fClear": "مسح البحث",
+    "fSearchLbl": "بحث",
+    "fNoResultHint": "جرّب تعديل بعض المرشحات أو إزالتها."
   }
 }

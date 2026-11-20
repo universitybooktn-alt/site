@@ -517,6 +517,22 @@
     "addToCart": "Ajouter au panier",
     "added": "Ajouté",
     "order": "Commander",
-    "pagesShort": "p."
+    "pagesShort": "p.",
+    "fCategory": "Catégorie",
+    "fType": "Type de document",
+    "fYear": "Année",
+    "fSort": "Trier par",
+    "fSortDefault": "Pertinence",
+    "fSortYear": "Plus récents",
+    "fSortPriceAsc": "Prix croissant",
+    "fSortPriceDesc": "Prix décroissant",
+    "fSortTitle": "Titre (A-Z)",
+    "fActive": "Filtres actifs",
+    "fReset": "Réinitialiser les filtres",
+    "fFilters": "Filtres",
+    "fRemove": "Retirer ce filtre",
+    "fClear": "Effacer la recherche",
+    "fSearchLbl": "Recherche",
+    "fNoResultHint": "Essayez de modifier ou de retirer certains filtres."
   }
 }
