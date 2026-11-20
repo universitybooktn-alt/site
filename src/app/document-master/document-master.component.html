@@ -43,50 +43,27 @@
               <button type="button" class="dmw-search-clear" *ngIf="rechercheSaisie" (click)="effacerRecherche()"
                       [title]="'documentMaster.fClear' | translate"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <button type="button" class="dmw-toggle" (click)="panneauOuvert = !panneauOuvert"
-                    [class.open]="panneauOuvert" [attr.aria-expanded]="panneauOuvert">
-              <i class="fa-solid fa-sliders"></i>{{ 'documentMaster.fFilters' | translate }}
-              <span class="dmw-badge" *ngIf="filtresActifs.length">{{ filtresActifs.length }}</span>
-            </button>
           </div>
 
-          <div class="dmw-body" [class.open]="panneauOuvert">
-            <div class="dmw-group">
-              <div class="dmw-label"><i class="fa-solid fa-folder-tree"></i>{{ 'documentMaster.fCategory' | translate }}</div>
-              <div class="dmw-chips">
-                <button type="button" class="dmw-chip" [class.active]="catActive === ''" [attr.aria-pressed]="catActive === ''"
-                        (click)="choisirCategorie('')">
-                  {{ 'documentMaster.all' | translate }}
-                  <span class="dmw-chip-count">{{ compte('') }}</span>
-                </button>
-                <button type="button" *ngFor="let c of categoriesRacine; trackBy: trackById" class="dmw-chip"
-                        [class.active]="catActive === c.id" [class.dim]="!compte(c.id)" [attr.aria-pressed]="catActive === c.id"
-                        (click)="choisirCategorie(c.id)">
-                  <i class="fa-solid fa-folder"></i>{{ c.nom }}
-                  <span class="dmw-chip-count">{{ compte(c.id) }}</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="dmw-group" *ngIf="sousCategories.length">
-              <div class="dmw-label"><i class="fa-solid fa-tags"></i>{{ 'documentMaster.fType' | translate }}</div>
-              <div class="dmw-chips dmw-chips-sub">
-                <button type="button" class="dmw-chip dmw-chip-sm" [class.active]="sousCatActive === ''"
-                        [attr.aria-pressed]="sousCatActive === ''" (click)="choisirSousCategorie('')">
-                  {{ 'documentMaster.all' | translate }} <span class="dmw-chip-count">{{ compte(catActive) }}</span>
-                </button>
-                <button type="button" *ngFor="let sc of sousCategories; trackBy: trackById" class="dmw-chip dmw-chip-sm"
-                        [class.active]="sousCatActive === sc.id" [class.dim]="!compte(catActive, sc.id)"
-                        [attr.aria-pressed]="sousCatActive === sc.id" (click)="choisirSousCategorie(sc.id)">
-                  {{ sc.nom }} <span class="dmw-chip-count">{{ compte(catActive, sc.id) }}</span>
-                </button>
-              </div>
-            </div>
-
+          <div class="dmw-body">
             <div class="dmw-selects">
               <label class="dmw-field">
+                <span class="dmw-label"><i class="fa-solid fa-folder-tree"></i>{{ 'documentMaster.fCategory' | translate }}</span>
+                <select class="dmw-select" [class.is-set]="catActive !== ''" [ngModel]="catActive" (ngModelChange)="choisirCategorie($event)">
+                  <option value="">{{ 'documentMaster.all' | translate }} ({{ compte('') }})</option>
+                  <option *ngFor="let c of categoriesRacine; trackBy: trackById" [value]="c.id">{{ c.nom }} ({{ compte(c.id) }})</option>
+                </select>
+              </label>
+              <label class="dmw-field" *ngIf="sousCategories.length">
+                <span class="dmw-label"><i class="fa-solid fa-tags"></i>{{ 'documentMaster.fType' | translate }}</span>
+                <select class="dmw-select" [class.is-set]="sousCatActive !== ''" [ngModel]="sousCatActive" (ngModelChange)="choisirSousCategorie($event)">
+                  <option value="">{{ 'documentMaster.all' | translate }} ({{ compte(catActive) }})</option>
+                  <option *ngFor="let sc of sousCategories; trackBy: trackById" [value]="sc.id">{{ sc.nom }} ({{ compte(catActive, sc.id) }})</option>
+                </select>
+              </label>
+              <label class="dmw-field">
                 <span class="dmw-label"><i class="fa-regular fa-calendar"></i>{{ 'documentMaster.fYear' | translate }}</span>
-                <select class="dmw-select" [ngModel]="filtreAnnee" (ngModelChange)="changerAnnee($event)">
+                <select class="dmw-select" [class.is-set]="filtreAnnee !== ''" [ngModel]="filtreAnnee" (ngModelChange)="changerAnnee($event)">
                   <option value="">{{ 'documentMaster.allYears' | translate }}</option>
                   <option *ngFor="let a of annees" [value]="a">{{ a }}</option>
                 </select>

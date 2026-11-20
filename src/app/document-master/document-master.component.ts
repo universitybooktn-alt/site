@@ -38,9 +38,6 @@ export class DocumentMasterComponent implements OnInit, OnDestroy {
   page = 1;
   readonly parPage = 30;
 
-  /** Panneau de filtres déplié (mobile uniquement). */
-  panneauOuvert = false;
-
   /** Résultats mis en cache : recalculés uniquement quand un filtre change. */
   fichesFiltrees: FicheMaster[] = [];
   fichesPage: FicheMaster[] = [];
