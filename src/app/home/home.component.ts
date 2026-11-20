@@ -208,7 +208,24 @@ export class HomeComponent implements OnInit, OnDestroy {
    *  boutique.component.ts#vueDeProduit pour que le carrousel d'accueil montre exactement ce que
    *  le lien "Voir tout" (mêmes queryParams) ouvrira. */
   private vueDeProduit(p: Produit): Domaine {
-    return (p.domaine === 'documents' || estProduitDocument(p)) ? 'documents' : 'fournitures';
+    if (p.domaine === 'documents') return 'documents';
+    // La taxonomie "Documents" du site (CategorieSite) fait foi dès qu'elle est chargée : un produit
+    // publié sous une de ces catégories est un document, tous les autres sont des fournitures —
+    // même règle que boutique.component.ts#vueDeProduit. Sans cela, des documents dont le libellé
+    // n'a aucun mot-clé ("Ihec", "prépa"…) s'affichaient dans « Fournitures scolaires ».
+    if (this.nomsCategoriesSite.size > 0) {
+      return this.nomsCategoriesSite.has(this.cleUniforme(p.categorie)) ? 'documents' : 'fournitures';
+    }
+    // Repli le temps du 1er rendu (avant la réponse de /catalogue/categories-site) : mots-clés.
+    return estProduitDocument(p) ? 'documents' : 'fournitures';
+  }
+
+  /** Noms (normalisés) des catégories de la taxonomie "Documents" du site. */
+  private nomsCategoriesSite = new Set<string>();
+
+  private cleUniforme(v: string | undefined | null): string {
+    return (v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .trim().toLowerCase().replace(/\s+/g, ' ');
   }
 
   /** Un produit relève-t-il de la catégorie d'une section ? Comparaison tolérante (casse /
@@ -264,8 +281,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       // produits d'une catégorie partagée avec Fournitures (retirés du carrousel Fournitures
       // ci-dessous — ils doivent réapparaître ici, sinon ils disparaissent de l'accueil).
       if (vue === 'documents') return this.vueDeProduit(p) === 'documents' || estCategorieCommune(p);
-      // "Fournitures scolaires" : appartenance STRICTE au domaine, jamais un ouvrage "Livre".
-      return p.domaine === 'fournitures';
+      // "Fournitures scolaires" : uniquement de vraies fournitures — jamais un document
+      // (catégories de la taxonomie Documents du site, ni ouvrages "Livre").
+      return p.domaine === 'fournitures' && this.vueDeProduit(p) === 'fournitures';
     };
 
     // La section généraliste "Fournitures scolaires" ne reprend pas ce qui a déjà sa propre
@@ -343,6 +361,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         site: this.categoriesSiteService.list().pipe(catchError(() => of({ categories: [] }))),
         caisse: this.categoriesCaisseService.list().pipe(catchError(() => of({ categories: [] })))
       }).subscribe(({ site, caisse }) => {
+        this.nomsCategoriesSite = new Set(site.categories.map(c => this.cleUniforme(c.nom)).filter(n => n));
         const nomsCaisse = new Set(caisse.categories.map(c => norm(c.nom)));
         this.nomsCategoriesCommunes = new Set(
           site.categories.map(c => norm(c.nom)).filter(n => n && nomsCaisse.has(n))
