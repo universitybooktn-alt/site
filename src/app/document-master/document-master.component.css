@@ -1,4 +1,7 @@
-.dmw-page { background: #F6F8FC; min-height: 60vh; }
+:host { display: block; max-width: 100%; }
+.dmw-page { background: #F6F8FC; min-height: 60vh; max-width: 100%; overflow-x: clip; }
+.dmw-page .container-xl { max-width: 100%; }
+.dmw-page img, .dmw-page select, .dmw-page input { max-width: 100%; }
 
 .dmw-title { font-size: clamp(20px, 4vw, 26px); }
 .dmw-sub { max-width: 640px; font-size: 13.5px; line-height: 1.5; }
@@ -109,7 +112,7 @@
 
 /* ── Tableau ── */
 .dmw-table-wrap {
-  background: #fff; border: 1px solid #ECEEF1; border-radius: 14px; overflow-x: auto;
+  background: #fff; border: 1px solid #ECEEF1; border-radius: 14px; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch;
 }
 .dmw-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .dmw-table th {
