@@ -533,6 +533,7 @@
     "fRemove": "Remove this filter",
     "fClear": "Clear search",
     "fSearchLbl": "Search",
-    "fNoResultHint": "Try changing or removing some filters."
+    "fNoResultHint": "Try changing or removing some filters.",
+    "fAllCategories": "All categories"
   }
 }
