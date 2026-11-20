@@ -38,6 +38,11 @@ export class DocumentMasterComponent implements OnInit, OnDestroy {
   page = 1;
   readonly parPage = 30;
 
+  /** Panneau de filtres déplié (mobile uniquement). */
+  panneauOuvert = false;
+  /** Nombre de filtres actifs contenus dans le panneau (hors recherche) — badge du bouton « Filtres ». */
+  nbFiltresPanneau = 0;
+
   /** Résultats mis en cache : recalculés uniquement quand un filtre change. */
   fichesFiltrees: FicheMaster[] = [];
   fichesPage: FicheMaster[] = [];
@@ -192,6 +197,7 @@ export class DocumentMasterComponent implements OnInit, OnDestroy {
     if (this.filtreAnnee) actifs.push({ cle: 'annee', libelle: this.filtreAnnee, icone: 'fa-calendar' });
     if (this.recherche.trim()) actifs.push({ cle: 'q', libelle: '« ' + this.recherche.trim() + ' »', icone: 'fa-magnifying-glass' });
     this.filtresActifs = actifs;
+    this.nbFiltresPanneau = actifs.filter(f => f.cle !== 'q').length + (this.tri !== 'defaut' ? 1 : 0);
   }
 
   /** Applique un changement de filtre : retour page 1, recalcul, mise à jour de l'URL. */

@@ -1,25 +1,25 @@
 <!-- TOP BAR -->
-<div class="border-bottom bg-white py-2">
+<div class="border-bottom bg-white py-2 ub-topbar">
   <div class="container-xl">
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div class="d-flex align-items-center justify-content-between gap-2 ub-topbar-row">
 
-      <!-- Gauche : email + téléphone -->
-      <div class="d-flex align-items-center gap-3">
-        <a href="mailto:universitybooktn@gmail.com"
-           class="d-flex align-items-center gap-2 text-decoration-none text-dark small">
+      <!-- Gauche : email + téléphone (icônes seules sous 576px) -->
+      <div class="d-flex align-items-center gap-3 ub-top-contact">
+        <a href="mailto:universitybooktn@gmail.com" aria-label="E-mail"
+           class="ub-top-link d-flex align-items-center gap-2 text-decoration-none text-dark small">
           <i class="fa-regular fa-envelope" style="color:var(--accent)"></i>
-          universitybooktn@gmail.com
+          <span class="ub-top-txt">universitybooktn@gmail.com</span>
         </a>
-        <span class="vr"></span>
-        <a href="tel:+21621717222"
-           class="d-flex align-items-center gap-2 text-decoration-none text-dark small">
+        <span class="vr ub-top-vr"></span>
+        <a href="tel:+21621717222" aria-label="Téléphone"
+           class="ub-top-link d-flex align-items-center gap-2 text-decoration-none text-dark small">
           <i class="fa-solid fa-phone" style="color:var(--accent)"></i>
-          +216 21 717 222
+          <span class="ub-top-txt">+216 21 717 222</span>
         </a>
       </div>
 
       <!-- Droite : horaires + langue + réseaux -->
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3 ub-top-right">
         <span class="d-none d-lg-flex align-items-center gap-2 small text-secondary">
           <i class="fa-regular fa-clock"></i>
           {{ 'header.topbar.hours' | translate }}
@@ -27,32 +27,28 @@
         <span class="vr d-none d-lg-block"></span>
 
         <!-- Sélecteur langue -->
-        <div class="d-flex align-items-center gap-1 border rounded-pill px-2 py-1">
-          <i class="fa-solid fa-globe text-secondary" style="font-size:12px"></i>
-          <div class="vr mx-1"></div>
+        <div class="d-flex align-items-center gap-1 border rounded-pill px-2 py-1 ub-lang">
+          <i class="fa-solid fa-globe text-secondary ub-lang-globe" style="font-size:12px"></i>
+          <div class="vr mx-1 ub-lang-vr"></div>
           <button *ngFor="let l of langues"
                   (click)="setLang(l)"
-                  class="btn btn-sm rounded-pill px-2 py-0"
-                  style="font-size:11px; font-weight:700;"
+                  class="btn btn-sm rounded-pill px-2 py-0 ub-lang-btn"
                   [style.background]="currentLang===l ? '#fff' : 'transparent'"
                   [style.color]="currentLang===l ? '#7E1F2E' : '#AEB6BF'">
             {{ l }}
           </button>
         </div>
-        <span class="vr"></span>
+        <span class="vr ub-top-vr-social"></span>
 
-        <!-- Réseaux sociaux -->
-        <div class="d-flex gap-2">
-          <a href="https://www.facebook.com/share/1K24nTTheb/" class="btn btn-sm rounded-circle p-1"
-             style="width:28px;height:28px;background:rgba(0,0,0,.05);display:flex;align-items:center;justify-content:center;">
+        <!-- Réseaux sociaux (déjà présents dans le footer : masqués sous 576px) -->
+        <div class="d-flex gap-2 ub-top-social">
+          <a href="https://www.facebook.com/share/1K24nTTheb/" class="btn btn-sm rounded-circle p-1 ub-soc-btn" aria-label="Facebook">
             <i class="fab fa-facebook-f" style="color:#0076ff;font-size:11px"></i>
           </a>
-          <a href="https://www.instagram.com/club.nett?stkn=MW16cmUwNzlveHJkOQ==" class="btn btn-sm rounded-circle p-1"
-             style="width:28px;height:28px;background:rgba(0,0,0,.05);display:flex;align-items:center;justify-content:center;">
+          <a href="https://www.instagram.com/club.nett?stkn=MW16cmUwNzlveHJkOQ==" class="btn btn-sm rounded-circle p-1 ub-soc-btn" aria-label="Instagram">
             <i class="fab fa-instagram" style="color:#a61896;font-size:11px"></i>
           </a>
-          <a href="https://www.tiktok.com/@club.net0?_r=1&_t=ZS-99VP4rQ3sWH" class="btn btn-sm rounded-circle p-1"
-             style="width:28px;height:28px;background:rgba(0,0,0,.05);display:flex;align-items:center;justify-content:center;">
+          <a href="https://www.tiktok.com/@club.net0?_r=1&_t=ZS-99VP4rQ3sWH" class="btn btn-sm rounded-circle p-1 ub-soc-btn" aria-label="TikTok">
             <i class="fab fa-tiktok" style="color:#000000;font-size:11px"></i>
           </a>
         </div>
@@ -86,7 +82,7 @@
            pied CTA. Fournitures = CategoriesCaisseService (hors Soutenance/Jeux/Livre) ; les
            autres rayons = lien direct + court descriptif. Les documents (catégories du site,
            payants, gratuits…) sont dans le menu « Documents universitaires » ci-dessous. -->
-      <div class="ub-boutique-item position-relative">
+      <div class="ub-boutique-item position-relative" (mouseenter)="ajusterMenusDeroulants()">
         <a routerLinkActive="ub-active"
            class="nav-link fw-semibold text-secondary py-2 d-flex align-items-center gap-1">
           {{ 'header.nav.shop' | translate }}
@@ -206,7 +202,7 @@
       <!-- Documents universitaires : même mega-menu que Boutique (rail à gauche, contenu du
            rayon survolé à droite, megaDocs pilote l'affichage). « Documents » liste les
            catégories / sous-catégories du site (CategoriesSiteService). -->
-      <div class="ub-boutique-item ub-docs-item position-relative">
+      <div class="ub-boutique-item ub-docs-item position-relative" (mouseenter)="ajusterMenusDeroulants()">
         <a class="nav-link fw-semibold text-secondary py-2 d-flex align-items-center gap-1" tabindex="0">
           {{ 'header.nav.universityDocs' | translate }}
           <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
@@ -464,7 +460,7 @@
     <!-- Panier -->
     <a href="#" (click)="onCartClick($event)" class="d-flex align-items-center justify-content-between py-3 fw-semibold border-bottom">
       <span><i class="fa-solid fa-cart-shopping me-2" style="color:var(--accent)"></i>{{ 'header.mobile.cart' | translate }}</span>
-      <span class="badge rounded-pill" style="background:var(--accent);font-size:11px;">{{ cartCount }}</span>
+      <span class="badge rounded-pill" style="background:var(--accent);font-size:12px;">{{ cartCount }}</span>
     </a>
 
     <!-- Accueil -->

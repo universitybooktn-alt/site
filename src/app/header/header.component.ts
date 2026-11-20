@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CartService } from '../services/cart.service';
@@ -18,7 +18,7 @@ import { formatCategorieLabel } from '../shared/format-label.util';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit, OnDestroy {
+export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   /** Exposée au template pour l'affichage des catégories/sous-catégories (casse d'origine
    *  imprévisible côté caisse) — voir format-label.util.ts. */
   readonly formatLabel = formatCategorieLabel;
@@ -212,6 +212,30 @@ export class HeaderComponent implements OnInit, OnDestroy {
   updateMobile(): void {
     this.isMobile = window.innerWidth <= 1080;
     if (!this.isMobile) this.menuOpen = false;
+    this.ajusterMenusDeroulants();
+  }
+
+  ngAfterViewInit(): void {
+    this.ajusterMenusDeroulants();
+  }
+
+  /** Garde les méga-menus (.ubm2) dans le viewport : même masqués (visibility:hidden) ils restent
+   *  dans le layout et élargissaient le document entre ~1300 et ~1500px. Le panneau est recalé
+   *  horizontalement (margin-left) pour que ses bords restent à ≥16px de ceux de l'écran ; à
+   *  l'ouverture il est donc complet et cliquable, sans masquer le débordement avec overflow. */
+  ajusterMenusDeroulants(): void {
+    setTimeout(() => {
+      const vw = document.documentElement.clientWidth;
+      const marge = 16;
+      document.querySelectorAll<HTMLElement>('app-header .ubm2').forEach(m => {
+        m.style.marginLeft = '0px';
+        const r = m.getBoundingClientRect();
+        let dx = 0;
+        if (r.right > vw - marge) dx = vw - marge - r.right;
+        if (r.left + dx < marge) dx = marge - r.left;
+        m.style.marginLeft = dx ? `${Math.round(dx)}px` : '';
+      });
+    });
   }
 
   toggleMenu(): void {

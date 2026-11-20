@@ -43,9 +43,15 @@
               <button type="button" class="dmw-search-clear" *ngIf="rechercheSaisie" (click)="effacerRecherche()"
                       [title]="'documentMaster.fClear' | translate"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            <button type="button" class="dmw-toggle" (click)="panneauOuvert = !panneauOuvert"
+                    [class.open]="panneauOuvert" [attr.aria-expanded]="panneauOuvert" aria-controls="dmw-body">
+              <i class="fa-solid fa-sliders"></i>{{ 'documentMaster.fFilters' | translate }}
+              <span class="dmw-badge" *ngIf="nbFiltresPanneau">{{ nbFiltresPanneau }}</span>
+              <i class="fa-solid fa-chevron-down dmw-toggle-chev"></i>
+            </button>
           </div>
 
-          <div class="dmw-body">
+          <div class="dmw-body" id="dmw-body" [class.open]="panneauOuvert">
             <div class="dmw-selects">
               <label class="dmw-field">
                 <span class="dmw-label"><i class="fa-solid fa-folder-tree"></i>{{ 'documentMaster.fCategory' | translate }}</span>
@@ -110,9 +116,9 @@
               <tr>
                 <th class="tc">{{ 'documentMaster.colNumber' | translate }}</th>
                 <th>{{ 'documentMaster.colTitle' | translate }}</th>
-                <th *ngIf="!sousCatActive" class="dmw-hide-sm">{{ 'documentMaster.colType' | translate }}</th>
-                <th class="dmw-hide-sm">{{ 'documentMaster.colYear' | translate }}</th>
-                <th class="tc dmw-hide-sm">{{ 'documentMaster.colPages' | translate }}</th>
+                <th *ngIf="!sousCatActive">{{ 'documentMaster.colType' | translate }}</th>
+                <th>{{ 'documentMaster.colYear' | translate }}</th>
+                <th class="tc">{{ 'documentMaster.colPages' | translate }}</th>
                 <th class="tr">{{ 'documentMaster.colPrice' | translate }}</th>
                 <th class="tc">{{ 'documentMaster.colActions' | translate }}</th>
               </tr>
@@ -123,11 +129,10 @@
                 <td>
                   <div class="dmw-titre" dir="auto">{{ f.titre }}</div>
                   <div class="dmw-meta" *ngIf="f.auteur" dir="auto"><i class="fa-regular fa-user me-1"></i>{{ f.auteur }}</div>
-                  <div class="dmw-meta dmw-show-sm">{{ f.annee }}<span *ngIf="f.annee && f.nbPages"> · </span><span *ngIf="f.nbPages">{{ f.nbPages }} {{ 'documentMaster.pagesShort' | translate }}</span></div>
-                </td>
-                <td *ngIf="!sousCatActive" class="dmw-hide-sm"><span class="dmw-pill">{{ nomCategorie(f.sousCategorie) || '—' }}</span></td>
-                <td class="dmw-hide-sm dmw-muted">{{ f.annee || '—' }}</td>
-                <td class="tc dmw-hide-sm dmw-muted">{{ f.nbPages || '—' }}</td>
+                                  </td>
+                <td *ngIf="!sousCatActive"><span class="dmw-pill">{{ nomCategorie(f.sousCategorie) || '—' }}</span></td>
+                <td class="dmw-muted">{{ f.annee || '—' }}</td>
+                <td class="tc dmw-muted">{{ f.nbPages || '—' }}</td>
                 <td class="tr dmw-prix">{{ formatPrix(f.prix) }}</td>
                 <td class="tc">
                   <div class="dmw-actions" *ngIf="f.prix > 0">
@@ -145,6 +150,33 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Cartes (mobile < 768px) : une carte par document, toutes les infos visibles -->
+        <div class="dmw-cards" *ngIf="fichesFiltrees.length">
+          <article class="dmw-card" *ngFor="let f of fichesPage; trackBy: trackById">
+            <div class="dmw-card-top">
+              <span class="dmw-num">{{ 'documentMaster.colNumber' | translate }} {{ f.numero || '—' }}</span>
+              <span class="dmw-pill" *ngIf="f.sousCategorie">{{ nomCategorie(f.sousCategorie) || '—' }}</span>
+            </div>
+            <h3 class="dmw-card-title" dir="auto">{{ f.titre }}</h3>
+            <div class="dmw-meta" *ngIf="f.auteur" dir="auto"><i class="fa-regular fa-user me-1"></i>{{ f.auteur }}</div>
+            <div class="dmw-card-tags">
+              <span class="dmw-info"><i class="fa-regular fa-calendar"></i>{{ f.annee || '—' }}</span>
+              <span class="dmw-info"><i class="fa-regular fa-file-lines"></i>{{ f.nbPages || '—' }} {{ 'documentMaster.pagesShort' | translate }}</span>
+              <span class="dmw-prix dmw-card-prix">{{ formatPrix(f.prix) }}</span>
+            </div>
+            <div class="dmw-actions" *ngIf="f.prix > 0">
+              <button type="button" class="dmw-btn-add" [class.added]="ajouteId === f.id" (click)="ajouterPanier(f)">
+                <i class="fa-solid" [class.fa-cart-plus]="ajouteId !== f.id" [class.fa-check]="ajouteId === f.id"></i>
+                <span class="dmw-btn-lbl">{{ (ajouteId === f.id ? 'documentMaster.added' : 'documentMaster.addToCart') | translate }}</span>
+              </button>
+              <button type="button" class="dmw-btn-buy" (click)="commander(f)">
+                <i class="fa-solid fa-bolt"></i>
+                <span class="dmw-btn-lbl">{{ 'documentMaster.order' | translate }}</span>
+              </button>
+            </div>
+          </article>
         </div>
 
         <!-- Pagination -->

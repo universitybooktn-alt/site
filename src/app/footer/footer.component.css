@@ -79,3 +79,15 @@
   transition: color .18s ease;
 }
 .ub-footer-legal:hover { color: #fff; }
+
+.ub-footer-tagline { font-size: 12px; }
+
+/* ── Mobile : cibles tactiles confortables (≥ 44px) sans toucher au desktop ── */
+@media (max-width: 1079.98px) {
+  .ub-footer-link, .ub-footer-legal {
+    min-height: 44px; min-width: 44px; display: inline-flex; align-items: center;
+  }
+  .ub-footer-social { width: 44px; height: 44px; }
+  .ub-footer-newsletter-input, .ub-footer input { font-size: 16px !important; }
+  .ub-footer-bottom .d-flex, .ub-footer-bottom { row-gap: 0; }
+}

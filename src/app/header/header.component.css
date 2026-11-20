@@ -366,7 +366,7 @@ button.ub-mobile-row {
 
 .ub-cart-badge {
   background: var(--accent);
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 800;
   min-width: 18px;
   padding: 3px 4px;
@@ -425,12 +425,12 @@ button.ub-mobile-row {
   top: 2px;
   right: 2px;
   min-width: 16px;
-  height: 16px;
+  height: 18px;
   padding: 0 4px;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -635,4 +635,48 @@ button.ub-mobile-row {
 /* Très juste au-dessus du passage en menu mobile : le logo seul suffit. */
 @media (max-width: 1279.98px) {
   .ub-brand-txt { display: none; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BARRE DU HAUT — boutons langue / réseaux (remplacent les styles inline),
+   et version compacte sur mobile (une seule ligne, cibles tactiles ≥ 36px).
+   ══════════════════════════════════════════════════════════════════════════ */
+.ub-topbar-row { flex-wrap: wrap; }
+.ub-lang-btn { font-size: 12px; font-weight: 700; }
+.ub-soc-btn {
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.05);
+}
+
+@media (max-width: 1079.98px) {
+  .ub-top-link, .ub-lang-btn, .ub-soc-btn {
+    min-width: 36px; min-height: 36px; position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  /* zone cliquable étendue à 44px sans agrandir l'élément visible */
+  .ub-lang-btn::after, .ub-soc-btn::after, .ub-top-link::after {
+    content: ''; position: absolute; inset: -4px;
+  }
+  .ub-soc-btn { width: 36px; height: 36px; }
+  .ub-lang-btn { font-size: 13px; }
+}
+
+@media (max-width: 575.98px) {
+  .ub-topbar { padding-top: 2px !important; padding-bottom: 2px !important; }
+  .ub-topbar-row { flex-wrap: nowrap; }
+  .ub-top-contact { gap: 2px !important; }
+  .ub-top-txt, .ub-top-vr, .ub-top-vr-social, .ub-top-social, .ub-lang-globe, .ub-lang-vr { display: none !important; }
+  .ub-top-link { font-size: 16px; }
+  .ub-top-link i { font-size: 16px; }
+  .ub-top-right { gap: 0 !important; }
+  .ub-lang { padding: 0 4px !important; }
+}
+
+/* Barre principale compacte sur petit mobile : en-tête total < 110px à 360px de large */
+@media (max-width: 575.98px) {
+  .ub-navbar { padding-top: 4px; padding-bottom: 4px; }
+  .ub-navbar .navbar-brand { padding: 0; }
+  .ub-navbar .navbar-brand img { height: 36px; }
+  .ub-navbar .btn.d-xl-none { min-width: 44px; min-height: 44px; padding: 0 10px; }
 }
